@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/reminderLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+
+    <RelativeLayout
+        android:id="@+id/since_start_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp">
+
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="22dp"
+            android:text="Days passed:"/>
+
+        <TextView
+            android:id="@+id/dialog_days_since"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+
+            android:gravity="center_horizontal"
+            />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000"/>
+
+    <RelativeLayout
+        android:layout_below="@+id/since_start_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000" />
+
+
+
+        <TextView
+            android:layout_alignParentLeft="true"
+            android:layout_marginStart="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="22dp"
+
+            android:text="Reminder:"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"/>
+
+        <Button
+
+            android:id="@+id/btn_reminder"
+            android:layout_alignParentRight="true"
+            android:layout_marginEnd="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="22dp"
+            android:textSize="22dp"
+            android:text="Set"
+            android:background="@color/cardview_light_background"
+            android:gravity="center_horizontal"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"/>
+            />
+
+
+
+    </RelativeLayout>
+
+
+
+
+
+</RelativeLayout>

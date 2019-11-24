@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="small_margin">16dp</dimen>
+    <dimen name="medium_margin">22dp</dimen>
+    <dimen name="large_margin">28dp</dimen>
+
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">20dp</dimen>
+    <dimen name="padding_large">28dp</dimen>
+
+    <dimen name="font_small">19dp</dimen>
+    <dimen name="font_medium">24dp</dimen>
+    <dimen name="font_large">28dp</dimen>
+
+
+</resources>
