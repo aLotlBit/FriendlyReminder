@@ -1,6 +1,10 @@
 package com.example.multitimer;
 
+import java.util.Comparator;
+
 public class Item {
+
+        private int mID;
 
         // Store the Title of the item
         private String mTitle;
@@ -15,15 +19,23 @@ public class Item {
 
         private int mMinuteOfDay;
 
-        // Constructor that is used to create an instance of the Movie object
-    public Item(String mTitle, long mMillisStart, long mMillisEnd , int mHourOfDay, int mMinuteOfDay, int mInterval){
+        private int mAlertActive;
+
+        // Constructor
+    public Item(Integer mID, String mTitle, long mMillisStart, long mMillisEnd , int mHourOfDay, int mMinuteOfDay, int mInterval, int mAlertActive){
+        this.mID = mID;
         this.mTitle = mTitle;
         this.mMillisStart = mMillisStart;
         this.mMillisEnd = mMillisEnd;
         this.mInterval = mInterval;
         this.mHourOfDay = mHourOfDay;
         this.mMinuteOfDay = mMinuteOfDay;
+        this.mAlertActive = mAlertActive;
     }
+
+        public int getmID() {return mID; }
+
+        public void setmID() {this.mID = mID; }
 
         public String getmTitle() {
         return mTitle;
@@ -42,11 +54,9 @@ public class Item {
     }
 
         public long getmMillisEnd() {
-        return mMillisEnd;
-    }
+        return mMillisEnd; }
 
         public void setmMillisEnd(long millisUntil) {
-
         this.mMillisEnd = System.currentTimeMillis() + millisUntil;
             }
 
@@ -74,13 +84,23 @@ public class Item {
         return mInterval;
         }
 
-        public int getDaysLeft() {
+        public void setmAlertActive(int mAlertActive) {this.mAlertActive = mAlertActive; }
+
+        public int getmAlertActive() {return mAlertActive; }
+
+        public Integer getDaysLeft() {
              // calculation for days:
             //int daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 86400000L);
             // calculation for minutes for testing
-            int daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 1000 / 60);
+            if (mMillisEnd != -1) {
+                Integer daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 1000 / 60);
+                return daysLeft;
+            } else {
+                Integer daysLeft = -1;
+                return daysLeft;
+            }
 
-            return daysLeft;
+
         }
 
         public long daysToMillis(int days) {
@@ -100,4 +120,30 @@ public class Item {
         return String.valueOf(min);
     }
 
+
+    // Comparators
+     public static class CompDaysUntilAlert implements Comparator<Item> {
+        @Override
+        public int compare(Item arg0, Item arg1) {
+            return (int) arg0.mMillisEnd - (int) arg1.mMillisEnd;
+        }
+    }
+
+    public static class CompDaysPassed implements Comparator<Item> {
+        @Override
+        public int compare(Item arg0, Item arg1) {
+            return (int) arg0.mMillisStart- (int) arg1.mMillisStart;
+        }
+    }
+
+
+
+
+
+    /*
+    @Override
+    public int compareTo(Item item) {
+        return Integer.compare(mAlertActive, item.mAlertActive);
+    }
+    */
 }

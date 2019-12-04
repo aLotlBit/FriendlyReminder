@@ -3,9 +3,11 @@ package com.example.multitimer;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -16,6 +18,8 @@ import androidx.core.app.NotificationCompat;
 public class NotificationHelper extends ContextWrapper {
     public static final String CHANNEL_ID = "1";
     public static final String CHANNEL_NAME = "Channel";
+
+    public static final String ACTION_RESTART = "ActionRestart";
 
     private NotificationManager mManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -49,7 +53,7 @@ public class NotificationHelper extends ContextWrapper {
         AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .build();
-        mChannel.setSound(soundUri, audioAttributes);
+        //mChannel.setSound(soundUri, audioAttributes);
         getManager().createNotificationChannel(mChannel);
     }
 
@@ -62,13 +66,25 @@ public class NotificationHelper extends ContextWrapper {
     }
 
 
-    public NotificationCompat.Builder getChannelNotification(String title, String message) {
+    public NotificationCompat.Builder getChannelNotification(String title, String message, Integer ID) {
+
+        Intent resetIntent = new Intent(this, AlertReceiver.class);
+        resetIntent.setAction(ACTION_RESTART);
+        resetIntent.putExtra("restart_reminder", "restart_reminder");
+        resetIntent.putExtra("id", ID);
+
+        PendingIntent resetPendingIntent =
+                PendingIntent.getBroadcast(this, 0, resetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
         return new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(R.drawable.ic_stat_name)
-            .setSound(soundUri);
+            //.setSound(soundUri);
+            .setContentIntent(resetPendingIntent)
+                .addAction(R.drawable.more, "Restart", resetPendingIntent);
+
 
     }
-
 }

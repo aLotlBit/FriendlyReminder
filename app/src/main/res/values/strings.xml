@@ -1,4 +1,36 @@
 <resources>
     <string name="app_name">MultiTimer</string>
+
+    <!-- menu items -->
     <string name="action_settings">Settings</string>
+    <string name="action_sort_by">Sort by</string>
+    <string name="sub_action_sort_by_daysUntilAlert">Days Until Alert</string>
+    <string name="sub_action_sort_by_daysPassed">Days passed</string>
+    <string name="sub_action_sort_by_reverse">Reverse</string>
+
+    <!-- dialog messages -->
+    <string name="title_new">Enter Title</string>
+    <string name="title_change">Change Title</string>
+    <string name="days_until_change">Set days until Alert</string>
+    <string name="interval_change">Set interval</string>
+    <string name="time_of_day_change">Set time of day</string>
+
+    <string name="dialog_btn_positve">OK</string>
+    <string name="dialog_btn_cancel">Cancel</string>
+
+
+
+    <!-- List item string -->
+    <string name="alert_first_part">in</string>
+    <string name="alert_multi_days_until">days</string>
+    <string name="alert_one_day_until">Tomorrow</string>
+    <string name="alert_today">Today</string>
+    <string name="alert_one_day_ago">Yesterday</string>
+    <string name="alert_multi_days_ago">days ago</string>
+
+    <string name="interval_first_part">Interval:</string>
+    <string name="interval_not_set">None set</string>
+    <string name="interval_one_day">day</string>
+    <string name="interval_multi_days">days</string>
+
 </resources>
