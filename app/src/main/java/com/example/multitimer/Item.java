@@ -86,7 +86,15 @@ public class Item {
 
         public void setmAlertActive(int mAlertActive) {this.mAlertActive = mAlertActive; }
 
-        public int getmAlertActive() {return mAlertActive; }
+        public boolean getmAlertActive() {
+        boolean active;
+        if (mAlertActive == 0) {
+                active = false;
+            } else {
+                active = true;
+            }
+                return active;
+        }
 
         public Integer getDaysLeft() {
              // calculation for days:

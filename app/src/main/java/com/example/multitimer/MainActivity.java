@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
                 if (setDaysToAlert) {
                     item.setmMillisEnd(item.daysToMillis(picked));
                     SharedPreferencesHelper.setLong(getApplicationContext(), "millis_end_" + item.getmID(), item.getmMillisEnd());
-                    if (item.getmAlertActive() == 1) {
+                    if (item.getmAlertActive()) {
                         setAlert(item.getmMillisEnd(), item.getmTitle(), item.getmID());
                     }
 

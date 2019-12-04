@@ -9,9 +9,11 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,88 +22,83 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 
 
     private Context mContext;
-    private List<Item> itemsList = new ArrayList<>();
+    private List<Item> itemsList;
 
     public ItemAdapter(@NonNull Context context, ArrayList<Item> list) {
         super(context, 0, list);
         this.mContext = context;
         itemsList = list;
+    }
 
+    @Override
+    public Item getItem(int position) {
+        return itemsList.get(position);
     }
 
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        final ViewHolder holder;
+        final Item currentItem = getItem(position);
 
-        View listItem = convertView;
-        if (listItem == null) {
-            LayoutInflater vi;
-            vi = LayoutInflater.from(getContext());
-            listItem = vi.inflate(R.layout.listview_item_layout, null);
+        if (convertView == null) {
 
+            holder = new ViewHolder();
+            LayoutInflater inflater = (LayoutInflater) mContext
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.listview_item_layout, null, true);
+
+            holder.tv_title = convertView.findViewById(R.id.tv_title);
+            holder.tv_daysPassed = convertView.findViewById(R.id.tv_days_passed);
+            holder.tv_daysUntilAlert = convertView.findViewById(R.id.tv_days_left);
+
+
+            holder.tv_timeOfDay = convertView.findViewById(R.id.tv_time_of_day);
+            holder.tv_interval = convertView.findViewById(R.id.tv_interval);
+            holder.cb_alertActive = convertView.findViewById(R.id.cb_alert_active);
+            holder.tv_restart = convertView.findViewById(R.id.tv_reset);
+
+            convertView.setTag(holder);
+
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
-        final Item currentItem = itemsList.get(position);
 
-        if (currentItem != null) {
+        holder.tv_title.setText(currentItem.getmTitle());
+        holder.tv_daysPassed.setText(currentItem.getDaysPassed());
+        holder.tv_daysUntilAlert.setText(getStringForTvDaysUntilAlert(currentItem));
+        holder.tv_interval.setText(getStringForTvInterval(currentItem));
+        holder.cb_alertActive.setChecked(currentItem.getmAlertActive());
+   //     holder.cb_alertActive.setTag(R.integer.checkboxbview, convertView);
+        holder.cb_alertActive.setTag(position);
+        holder.cb_alertActive.setOnClickListener(new View.OnClickListener() {
 
+             @Override
+             public void onClick(View v) {
 
-            TextView tv_title = listItem.findViewById(R.id.tv_title);
-            TextView tv_daysPassed = listItem.findViewById(R.id.tv_days_passed);
-            TextView tv_daysUntilAlert = listItem.findViewById(R.id.tv_days_left);
+                // View tempview = (View) holder.cb_alertActive.getTag(R.integer.checkboxbview);
+                 //    TextView tv = (TextView) tempview.findViewById(R.id.animal);
+                 Integer pos = (Integer) holder.cb_alertActive.getTag();
+                 Toast.makeText(mContext, "Checkbox "+pos+" clicked!", Toast.LENGTH_SHORT).show();
 
-
-            if (tv_title != null) {
-                tv_title.setText(currentItem.getmTitle());
-            }
-            if (tv_daysPassed != null) {
-                tv_daysPassed.setText(currentItem.getDaysPassed());
-            }
-            if (tv_daysUntilAlert != null) {
-                tv_daysUntilAlert.setText(getStringForTvDaysUntilAlert(currentItem));
-            }
-
-
-            TextView tv_timeOfDay = listItem.findViewById(R.id.tv_time_of_day);
-            TextView tv_interval = listItem.findViewById(R.id.tv_interval);
-            final CheckBox cb_alertActive = listItem.findViewById(R.id.cb_alert_active);
-            TextView tv_restart = listItem.findViewById(R.id.tv_reset);
+                 if (itemsList.get(pos).getmAlertActive()) {
+                     itemsList.get(pos).setmAlertActive(0);
+                     SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
+                  //   ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
 
 
+                 } else {
+                     itemsList.get(pos).setmAlertActive(1);
+                     SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 1);
+                  //   ((MainActivity) mContext).setAlert(currentItem.getmMillisEnd(), currentItem.getmTitle(), currentItem.getmID());
 
-            if (tv_interval != null) {
-                tv_interval.setText(getStringForTvInterval(currentItem));
-            }
+                 }
+             }
 
-            cb_alertActive.setChecked(false);
-
-            if (cb_alertActive != null) {
-                if (currentItem.getmAlertActive() == 1) {
-                    cb_alertActive.setChecked(true);
-                } else {
-                    cb_alertActive.setChecked(false);
-                }
-
-                cb_alertActive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            cb_alertActive.setChecked(true);
-                            currentItem.setmAlertActive(1);
-                            SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 1);
-                            ((MainActivity) mContext).setAlert(currentItem.getmMillisEnd(), currentItem.getmTitle(), currentItem.getmID());
-                        } else {
-                            cb_alertActive.setChecked(false);
-                            currentItem.setmAlertActive(0);
-                            SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
-                            ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
-                        }
-                    }
-                });
-            }
+         });
 
 
-            tv_title.setOnClickListener(new View.OnClickListener() {
+            holder.tv_title.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //access method in mainActivity from adapter
@@ -111,7 +108,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 }
             });
 
-            tv_daysUntilAlert.setOnClickListener(new View.OnClickListener() {
+            holder.tv_daysUntilAlert.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //access method in mainActivity from adapter
@@ -121,7 +118,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 }
             });
 
-            tv_timeOfDay.setOnClickListener(new View.OnClickListener() {
+            holder.tv_timeOfDay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //access method in mainActivity from adapter
@@ -131,7 +128,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 }
             });
 
-            tv_interval.setOnClickListener(new View.OnClickListener() {
+            holder.tv_interval.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //access method in mainActivity from adapter
@@ -142,7 +139,7 @@ public class ItemAdapter extends ArrayAdapter<Item> {
             });
 
 
-            tv_restart.setOnClickListener(new View.OnClickListener() {
+            holder.tv_restart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     //access method in mainActivity from adapter
@@ -153,16 +150,13 @@ public class ItemAdapter extends ArrayAdapter<Item> {
             });
 
 
-            tv_daysPassed.setClickable(false);
-            tv_daysUntilAlert.setClickable(false);
-            tv_timeOfDay.setClickable(false);
+            holder.tv_daysPassed.setClickable(false);
+            holder.tv_daysUntilAlert.setClickable(false);
+            holder.tv_timeOfDay.setClickable(false);
 
 
-        }
-
-        return listItem;
+        return convertView;
     }
-
 
     private String getStringForTvDaysUntilAlert(Item item) {
         int daysUntilAlert = item.getDaysLeft();
@@ -196,3 +190,39 @@ public class ItemAdapter extends ArrayAdapter<Item> {
     }
 
 }
+
+class ViewHolder {
+    protected TextView tv_title;
+    protected TextView tv_daysPassed;
+    protected TextView tv_daysUntilAlert;
+
+    protected TextView tv_timeOfDay;
+    protected TextView tv_interval;
+    protected CheckBox cb_alertActive;
+    protected TextView tv_restart;
+}
+
+
+
+
+    /*
+    cb_alertActive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (isChecked) {
+                cb_alertActive.setChecked(true);
+                currentItem.setmAlertActive(1);
+                SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 1);
+                ((MainActivity) mContext).setAlert(currentItem.getmMillisEnd(), currentItem.getmTitle(), currentItem.getmID());
+            } else {
+                cb_alertActive.setChecked(false);
+                currentItem.setmAlertActive(0);
+                SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
+                ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
+            }
+        }
+    });
+}
+
+     */
