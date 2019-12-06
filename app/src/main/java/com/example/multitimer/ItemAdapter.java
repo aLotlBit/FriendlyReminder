@@ -1,12 +1,14 @@
 package com.example.multitimer;
 
 import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,52 +54,49 @@ public class ItemAdapter extends ArrayAdapter<Item> {
             holder.tv_title = convertView.findViewById(R.id.tv_title);
             holder.tv_daysPassed = convertView.findViewById(R.id.tv_days_passed);
             holder.tv_daysUntilAlert = convertView.findViewById(R.id.tv_days_left);
-
-
             holder.tv_timeOfDay = convertView.findViewById(R.id.tv_time_of_day);
-            holder.tv_interval = convertView.findViewById(R.id.tv_interval);
-            holder.cb_alertActive = convertView.findViewById(R.id.cb_alert_active);
-            holder.tv_restart = convertView.findViewById(R.id.tv_reset);
 
             convertView.setTag(holder);
 
         } else {
             holder = (ViewHolder) convertView.getTag();
-        }
+            holder.tv_interval = convertView.findViewById(R.id.tv_interval);
+            holder.cb_alertActive = convertView.findViewById(R.id.cb_alert_active);
+            holder.tv_restart = convertView.findViewById(R.id.tv_reset);
+            holder.groupExpanded = convertView.findViewById(R.id.expanded);
+            holder.ivAlarm = convertView.findViewById(R.id.iv_alarm);
+            holder.ivArrow = convertView.findViewById(R.id.iv_arrow);
+            holder.tv_delete = convertView.findViewById(R.id.tv_delete);
 
-        holder.tv_title.setText(currentItem.getmTitle());
-        holder.tv_daysPassed.setText(currentItem.getDaysPassed());
-        holder.tv_daysUntilAlert.setText(getStringForTvDaysUntilAlert(currentItem));
-        holder.tv_interval.setText(getStringForTvInterval(currentItem));
-        holder.cb_alertActive.setChecked(currentItem.getmAlertActive());
-   //     holder.cb_alertActive.setTag(R.integer.checkboxbview, convertView);
-        holder.cb_alertActive.setTag(position);
-        holder.cb_alertActive.setOnClickListener(new View.OnClickListener() {
+            holder.tv_interval.setText(getStringForTvInterval(currentItem));
+            holder.cb_alertActive.setChecked(currentItem.getmAlertActive());
+            //     holder.cb_alertActive.setTag(R.integer.checkboxbview, convertView);
+            holder.cb_alertActive.setTag(position);
+            holder.cb_alertActive.setOnClickListener(new View.OnClickListener() {
 
-             @Override
-             public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
 
-                // View tempview = (View) holder.cb_alertActive.getTag(R.integer.checkboxbview);
-                 //    TextView tv = (TextView) tempview.findViewById(R.id.animal);
-                 Integer pos = (Integer) holder.cb_alertActive.getTag();
-                 Toast.makeText(mContext, "Checkbox "+pos+" clicked!", Toast.LENGTH_SHORT).show();
+                    Integer pos = (Integer) holder.cb_alertActive.getTag();
+                    Item item = itemsList.get(pos);
 
-                 if (itemsList.get(pos).getmAlertActive()) {
-                     itemsList.get(pos).setmAlertActive(0);
-                     SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
-                  //   ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
+                        if (item.getmAlertActive()) {
+                        item.setmAlertActive(0);
+                        SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
+                        ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
 
 
-                 } else {
-                     itemsList.get(pos).setmAlertActive(1);
-                     SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 1);
-                  //   ((MainActivity) mContext).setAlert(currentItem.getmMillisEnd(), currentItem.getmTitle(), currentItem.getmID());
+                    } else if (item.getmMillisEnd() - System.currentTimeMillis() > 0) {
+                        item.setmAlertActive(1);
+                        SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 1);
+                        ((MainActivity) mContext).setAlert(currentItem.getmMillisEnd(), currentItem.getmTitle(), currentItem.getmID());
+                    } else {
+                            holder.cb_alertActive.setChecked(false);
+                            ((MainActivity) mContext).showDialogNumberPicker(item, true);
+                        }
+                }
 
-                 }
-             }
-
-         });
-
+            });
 
             holder.tv_title.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -138,7 +138,6 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 }
             });
 
-
             holder.tv_restart.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -149,10 +148,68 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 }
             });
 
+            holder.tv_delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //access method in mainActivity from adapter
+                    if (mContext instanceof MainActivity) {
+                        ((MainActivity) mContext).deleteItem(currentItem);
+                    }
+                }
+            });
 
+
+
+            //must be set after onClickListeners to make TextViews unckliable after startup
+            holder.tv_title.setClickable(false);
             holder.tv_daysPassed.setClickable(false);
             holder.tv_daysUntilAlert.setClickable(false);
             holder.tv_timeOfDay.setClickable(false);
+
+
+
+            if (!currentItem.getmExpanded()) {
+                holder.groupExpanded.setVisibility(View.GONE);
+                holder.tv_daysUntilAlert.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_small));
+                holder.tv_timeOfDay.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_small));
+                //TODO why does is textsize differen when set with xml?
+                holder.tv_interval.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
+                holder.ivAlarm.setImageResource(R.drawable.notification);
+                holder.ivArrow.setImageResource((R.drawable.arrow_down));
+                holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.timer, 0, 0, 0);
+                holder.tv_title.setClickable(false);
+                holder.tv_daysUntilAlert.setClickable(false);
+                holder.tv_timeOfDay.setClickable(false);
+                convertView.setBackgroundColor(0xffffffff);
+
+            } else {
+                holder.groupExpanded.setVisibility(View.VISIBLE);
+                holder.tv_daysUntilAlert.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
+                holder.tv_timeOfDay.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
+                //TODO why does is textsize differen when set with xml?
+                holder.tv_interval.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
+                holder.ivAlarm.setImageResource(R.drawable.edit);
+                holder.ivArrow.setImageResource((R.drawable.arrow_up));
+                holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.refresh, 0, 0, 0);
+                holder.tv_title.setClickable(true);
+                holder.tv_daysUntilAlert.setClickable(true);
+                holder.tv_timeOfDay.setClickable(true);
+
+                convertView.setBackgroundColor(0xffcccccc);
+            }
+
+        }
+
+
+
+
+        holder.tv_title.setText(currentItem.getmTitle());
+        holder.tv_daysPassed.setText(currentItem.getDaysPassed());
+        holder.tv_daysUntilAlert.setText(getStringForTvDaysUntilAlert(currentItem));
+
+
+
+
 
 
         return convertView;
@@ -200,6 +257,11 @@ class ViewHolder {
     protected TextView tv_interval;
     protected CheckBox cb_alertActive;
     protected TextView tv_restart;
+
+    protected ImageView ivAlarm;
+    protected ImageView ivArrow;
+    protected View groupExpanded;
+    protected TextView tv_delete;
 }
 
 

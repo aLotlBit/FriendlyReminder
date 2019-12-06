@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.71" />
+        app:layout_constraintGuide_percent="0.64" />
 
     <ImageView
         android:id="@+id/iv_alarm"
@@ -134,7 +134,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:drawableLeft="@drawable/delete"
-        android:text="Delete"
+        android:text="@string/btn_delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"

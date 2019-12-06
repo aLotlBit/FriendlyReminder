@@ -21,6 +21,8 @@ public class Item {
 
         private int mAlertActive;
 
+        private boolean mExpanded;
+
         // Constructor
     public Item(Integer mID, String mTitle, long mMillisStart, long mMillisEnd , int mHourOfDay, int mMinuteOfDay, int mInterval, int mAlertActive){
         this.mID = mID;
@@ -31,6 +33,7 @@ public class Item {
         this.mHourOfDay = mHourOfDay;
         this.mMinuteOfDay = mMinuteOfDay;
         this.mAlertActive = mAlertActive;
+        this.mExpanded = false;
     }
 
         public int getmID() {return mID; }
@@ -96,6 +99,9 @@ public class Item {
                 return active;
         }
 
+        public void setmExpanded(boolean mExpanded)  {this.mExpanded = mExpanded; };
+        public boolean getmExpanded() {return mExpanded; }
+
         public Integer getDaysLeft() {
              // calculation for days:
             //int daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 86400000L);
@@ -104,14 +110,11 @@ public class Item {
                 Integer daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 1000 / 60);
                 return daysLeft;
             } else {
-                Integer daysLeft = -1;
-                return daysLeft;
+                return -1;
             }
-
-
         }
 
-        public long daysToMillis(int days) {
+        static long daysToMillis(int days) {
         //days for later
         // long millis = (long) days *  86400000L;
         //minutes for testing
@@ -132,26 +135,20 @@ public class Item {
     // Comparators
      public static class CompDaysUntilAlert implements Comparator<Item> {
         @Override
-        public int compare(Item arg0, Item arg1) {
-            return (int) arg0.mMillisEnd - (int) arg1.mMillisEnd;
+        public int compare(Item i1, Item i2) {
+            //different sort orders for active alerts and past alerts
+            if (i1.mMillisEnd - System.currentTimeMillis() >= 0 && i2.mMillisEnd - System.currentTimeMillis() >= 0) {
+                return (int) i1.mMillisEnd - (int) i2.mMillisEnd;
+            }
+            return (int) i2.mMillisEnd - (int) i1.mMillisEnd;
         }
     }
 
     public static class CompDaysPassed implements Comparator<Item> {
         @Override
-        public int compare(Item arg0, Item arg1) {
-            return (int) arg0.mMillisStart- (int) arg1.mMillisStart;
+        public int compare(Item i1, Item i2) {
+            return (int) i2.mMillisStart- (int) i1.mMillisStart;
         }
     }
 
-
-
-
-
-    /*
-    @Override
-    public int compareTo(Item item) {
-        return Integer.compare(mAlertActive, item.mAlertActive);
-    }
-    */
 }

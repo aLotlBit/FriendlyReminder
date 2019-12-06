@@ -40,6 +40,7 @@ public class NotificationHelper extends ContextWrapper {
 
     }
 
+    //TODO only for API 16+
     public void createChannel() {
 
        // Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
@@ -72,6 +73,7 @@ public class NotificationHelper extends ContextWrapper {
         resetIntent.setAction(ACTION_RESTART);
         resetIntent.putExtra("restart_reminder", "restart_reminder");
         resetIntent.putExtra("id", ID);
+        resetIntent.putExtra("title", title);
 
         PendingIntent resetPendingIntent =
                 PendingIntent.getBroadcast(this, 0, resetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -83,8 +85,7 @@ public class NotificationHelper extends ContextWrapper {
             .setSmallIcon(R.drawable.ic_stat_name)
             //.setSound(soundUri);
             .setContentIntent(resetPendingIntent)
-                .addAction(R.drawable.more, "Restart", resetPendingIntent);
-
+            .addAction(R.drawable.more, "Restart", resetPendingIntent);
 
     }
 }

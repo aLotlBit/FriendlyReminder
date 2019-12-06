@@ -1,12 +1,13 @@
 <resources>
-    <string name="app_name">MultiTimer</string>
+    <string name="app_name">RegularReminder</string>
 
     <!-- menu items -->
     <string name="action_settings">Settings</string>
     <string name="action_sort_by">Sort by</string>
     <string name="sub_action_sort_by_daysUntilAlert">Days Until Alert</string>
     <string name="sub_action_sort_by_daysPassed">Days passed</string>
-    <string name="sub_action_sort_by_reverse">Reverse</string>
+    <string name="sub_action_sort_inverted">Inverted</string>
+    <string name="action_clear_all_data">Clear all data</string>
 
     <!-- dialog messages -->
     <string name="title_new">Enter Title</string>
@@ -20,7 +21,7 @@
 
 
 
-    <!-- List item string -->
+    <!-- List item strings -->
     <string name="alert_first_part">in</string>
     <string name="alert_multi_days_until">days</string>
     <string name="alert_one_day_until">Tomorrow</string>
@@ -32,5 +33,7 @@
     <string name="interval_not_set">None set</string>
     <string name="interval_one_day">day</string>
     <string name="interval_multi_days">days</string>
+
+    <string name="btn_delete">Delete</string>
 
 </resources>
