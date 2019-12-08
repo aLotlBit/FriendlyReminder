@@ -10,7 +10,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class BootReceiver extends BroadcastReceiver {
-    ArrayList<Item> itemsList;
+    private ArrayList<Item> itemsList;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -24,6 +24,7 @@ public class BootReceiver extends BroadcastReceiver {
                 Intent newIntent = new Intent(context, AlertReceiver.class);
                 newIntent.putExtra("title", item.getmTitle());
                 newIntent.putExtra("id", item.getmID());
+                newIntent.setAction("ALERT");
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, item.getmID(), newIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 alarmManager.set(AlarmManager.RTC_WAKEUP, item.getmMillisEnd(), pendingIntent);
             }

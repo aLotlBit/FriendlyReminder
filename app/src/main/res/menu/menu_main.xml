@@ -32,6 +32,11 @@
                 android:title="@string/sub_action_sort_by_daysPassed"
                 android:checkable="true"
                 app:showAsAction="never"/>
+            <item
+                android:id="@+id/sub_action_sort_by_alertActive"
+                android:title="@string/sub_action_sort_by_alertActive"
+                android:checkable="true"
+                app:showAsAction="never"/>
 
             <item
                 android:id="@+id/sub_action_sort_inverted"

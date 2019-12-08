@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,9 +30,16 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
+
+    static private String TAG = "MAIN_ACTIVITY";
+    static private long ONE_DAY = 86400000L;
+    static private long THREE_HOURS = 10800000L;
+
+
 
     private Menu optionsMenu;
     private ArrayList<Item> itemsList;
@@ -54,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
 
     private int sortInverted;
 
+    private MenuItem checkedMenuItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         newItem = false;
 
         itemsList = SharedPreferencesHelper.loadData(this);
+
         adapter = new ItemAdapter(this, itemsList);
 
         sortMode = SharedPreferencesHelper.getSortMode(this);
@@ -83,9 +94,12 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 int id = SharedPreferencesHelper.getCurrentID(getApplicationContext());
                 newItem = true;
-                showDialogTitle(new Item(id, "", System.currentTimeMillis(), -1, 0, 0, -1, 0));
+                showDialogTitle(new Item(id, "", System.currentTimeMillis(), -1,  -1, 0));
+
+
             }
         });
 
@@ -100,24 +114,43 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        //TODO rename
-        //registers intent to restart reminder when app is open
-        registerReceiver(broadcastReceiver_, new IntentFilter("RESTART_REMINDER"));
 
-        registerReceiver(broadcastReceiver, new IntentFilter("RESET_ALERT_ACTIVE"));
+
+
+
+        //
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("DISABLE_ALERT_ACTIVE");
+        filter.addAction("RESTART_RUNNING");
+        filter.addAction("PLUS_ONE_DAY");
+        filter.addAction("PLUS_THREE_HOURS");
+        filter.addAction("CONTENT");
+
+
+
+        //    registerReceiver(broadcastReceiver_, new IntentFilter("RESTART_REMINDER"));
+
+        registerReceiver(broadcastReceiver, filter);
 
 
         //restarts reminder when app was closed
+
         Intent intent = getIntent();
-        if (intent.hasExtra("RESTART_REMINDER")) {
-            Toast.makeText(getApplicationContext(), "WUah", Toast.LENGTH_LONG).show();
-            int ID = intent.getIntExtra("id", -1);
-            restartAlert(0);
-            moveTaskToBack(true);
+        if (intent.getAction() == "CONTENT") {
+            int id = intent.getIntExtra("id", -1);
+            Item item = getItemByID(id);
+            expandListItem(item);
+            Log.d(TAG, "CONTENT received from launch with id" + Boolean.toString(item.getmExpanded()));
         }
+
 
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     protected void onPause() {
@@ -135,22 +168,64 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
-        unregisterReceiver(broadcastReceiver_);
+      //  unregisterReceiver(broadcastReceiver_);
 
     }
 
-    //resets 'alertActive' when app is open. AlertActive needs to be reset after alert was received in ALertReceiver
+    //resets values when app is open. AlertActive needs to be reset after alert was received in ALertReceiver
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("id")) {
-                int id = intent.getIntExtra("id", -1);
-                Item item = getItemByID(id);
-                item.setmAlertActive(0);
-                adapter.notifyDataSetChanged();
+           // String action = intent.getAction();
+            Log.d("MainActivity", "intent received:  " );
+
+            switch (intent.getAction()) {
+                case "DISABLE_ALERT_ACTIVE":
+                    //when alert was received alertActive needs to be set to false
+                    int id = intent.getIntExtra("id", -1);
+                    Item item = getItemByID(id);
+                    item.setmAlertActive(0);
+                    adapter.notifyDataSetChanged();
+                    break;
+                case "RESTART_RUNNING":
+                    //when restart button is pressed millis and alertActive need to be set
+                    int id_1 = intent.getIntExtra("id", -1);
+                    Item item_1 = getItemByID(id_1);
+                    item_1.setmMillisStart(System.currentTimeMillis());
+                    item_1.setmMillisEnd(item_1.calcMillisEnd(item_1.getmInterval()));
+                    item_1.setmAlertActive(1);
+                    adapter.notifyDataSetChanged();
+                    break;
+                case "PLUS_ONE_DAY":
+                    int id_2 = intent.getIntExtra("id", -1);
+                    Item item_2 = getItemByID(id_2);
+                    item_2.setmMillisEnd(item_2.getmMillisEnd() + ONE_DAY);
+                    item_2.setmAlertActive(1);
+                    adapter.notifyDataSetChanged();
+                    break;
+                case "PLUS_THREE_HOURS":
+                    Log.d(TAG, "Plus3H Received");
+                    int id_3 = intent.getIntExtra("id", -1);
+                    Item item_3 = getItemByID(id_3);
+                    item_3.setmMillisEnd(item_3.getmMillisEnd() + THREE_HOURS);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(item_3.getmMillisEnd());
+                    item_3.setmHourOfDay(calendar.get(Calendar.HOUR_OF_DAY));
+                    item_3.setmMinuteOfDay(calendar.get(Calendar.MINUTE));
+                    item_3.setmAlertActive(1);
+                    adapter.notifyDataSetChanged();
+                    break;
+                case "CONTENT":
+                    Log.d(TAG, "CONTENT Received");
+                    int id_4 = intent.getIntExtra("id", -1);
+                    Item item_4 = getItemByID(id_4);
+                    expandListItem(item_4);
+                    break;
             }
         }
     };
+
+    /*
 
     BroadcastReceiver broadcastReceiver_ = new BroadcastReceiver() {
         @Override
@@ -159,12 +234,14 @@ public class MainActivity extends AppCompatActivity {
                 int ID = intent.getIntExtra("id", -1);
                 Item item = getItemByID(ID);
                 item.setmMillisStart(System.currentTimeMillis());
-                item.setmMillisEnd(Item.daysToMillis(item.getmInterval()));
+                item.setmMillisEnd(item.calcMillisEnd(item.getmInterval()));
                 item.setmAlertActive(1);
                 Log.i("blab", "blub");
             }
         }
     };
+
+     */
 
 
 
@@ -183,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             expandedItem = null;
         }
+
     }
 
 
@@ -206,37 +284,31 @@ public class MainActivity extends AppCompatActivity {
         showDialogNumberPicker(item, false);
     }
 
-    public void setAlert(Long millis, String title, int id) {
-        setNotification(millis, title, id);
-    }
 
     public void cancelAlert(String title, int id) {
         cancelNotification(title, id);
     }
 
+    //TODO check if interval is set
     public void restartAlert(Integer ID) {
         Item item = getItemByID(ID);
         item.setmMillisStart(System.currentTimeMillis());
-        item.setmMillisEnd(Item.daysToMillis(item.getmInterval()));
-        item.setmAlertActive(1);
-        adapter.notifyDataSetChanged();
+        item.setmMillisEnd(item.calcMillisEnd(item.getmInterval()));
         SharedPreferencesHelper.setLong(getApplicationContext(), "millis_start_" + item.getmID(), item.getmMillisStart());
-        SharedPreferencesHelper.setLong(getApplicationContext(), "millis_end_" + item.getmID(), item.getmMillisEnd());
-        SharedPreferencesHelper.setInt(getApplicationContext(), "alert_active_" + item.getmID(), 1);
-        setAlert(item.getmMillisEnd(), item.getmTitle(), item.getmID());
+        setAlert(item, item.getmMillisEnd());
     }
 
     public void sortItems() {
         if (sortMode == 0) {
             Collections.sort(itemsList, new Item.CompDaysUntilAlert());
-            adapter.notifyDataSetChanged();
         } else if (sortMode == 1) {
             Collections.sort(itemsList, new Item.CompDaysPassed());
-            adapter.notifyDataSetChanged();
-        }
+        } else if (sortMode == 2)
+            Collections.sort(itemsList, new Item.CompAlertActive());
         if (sortInverted == 1 ){
             Collections.reverse(itemsList);
         }
+        adapter.notifyDataSetChanged();
     }
 
     public void deleteItem(Item item) {
@@ -251,9 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //TODO newitem = false    wenn dialog focus verliert             alertDialog.setCanceledOnTouchOutside(false) ;
-    // Maybe just two sepparate dialogs?
-    // Make ok-btn only clickable when title is entered
+    //TODO Make ok-btn only clickable when title is entered
     private void showDialogTitle(final Item item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_new, null);
@@ -312,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String title = enterTitle.getText().toString();
                 if (title.length() < 1) {
-                    Toast.makeText(getApplicationContext(), "Enter Title!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_title), Toast.LENGTH_SHORT).show();
 
                 } else {
                     Context context = getApplicationContext();
@@ -327,6 +397,9 @@ public class MainActivity extends AppCompatActivity {
                         expandListItem(item);
                         sortItems();
                         newItem = false;
+                    } else if (item.getmAlertActive()) {
+                        //reset Alert with new title so correct title shows in notification
+                        setAlert(item, item.getmMillisEnd());
                     }
 
                     SharedPreferencesHelper.setString(context, "title_" + String.valueOf(ID), title);
@@ -366,12 +439,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 int picked = numberPicker.getValue();
                 if (setDaysToAlert) {
-                    item.setmMillisEnd(item.daysToMillis(picked));
-                    SharedPreferencesHelper.setLong(getApplicationContext(), "millis_end_" + item.getmID(), item.getmMillisEnd());
-                    setAlert(item.getmMillisEnd(), item.getmTitle(), item.getmID());
-                    //activate alert in case it's not active
-                    item.setmAlertActive(1);
-                    SharedPreferencesHelper.setInt(getApplicationContext(), "alert_active_" + item.getmID(), 1);
+                   // item.setmMillisEnd(item.calcMillisEnd(picked));
+                    setAlert(item, item.calcMillisEnd(picked));
+
                     // set Interval to daysUntilAlert when no interval is set
                     if (item.getmInterval() == -1) {
                         item.setmInterval(picked);
@@ -387,7 +457,6 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setNegativeButton(getString(R.string.dialog_btn_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Cancel" button, so dismiss the dialog
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -410,19 +479,23 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setView(dialogView);
 
-        //hardcoded
         builder.setMessage(getString(R.string.time_of_day_change));
         builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int hour = timePicker.getHour();
-                int minute = timePicker.getMinute();
-
-                textView.setText(hour + ":" + minute);
-
+                //hold tmp time of day to reset to in case alert is not set
+                int tmp_hour = item.getmHourOfDay();
+                int tmp_min = item.getmMinuteOfDay();
+                item.setmHourOfDay(timePicker.getHour());
+                item.setmMinuteOfDay(timePicker.getMinute());
+                if (!setAlert(item, item.calcMillisEnd(item.getDaysLeft()))) {
+                    item.setmHourOfDay(tmp_hour);
+                    item.setmMinuteOfDay(tmp_min);
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.dialog_btn_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
                 if (dialog != null) {
@@ -431,7 +504,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Create and show the AlertDialog
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -443,9 +515,11 @@ public class MainActivity extends AppCompatActivity {
         optionsMenu = menu;
 
         if (sortMode == 0) {
-            optionsMenu.findItem(R.id. sub_action_sort_by_daysUntilAlert).setChecked(true);
+            checkedMenuItem = optionsMenu.findItem(R.id. sub_action_sort_by_daysUntilAlert).setChecked(true);
         } else if (sortMode == 1) {
-            optionsMenu.findItem(R.id.sub_action_sort_by_daysPassed).setChecked(true);
+            checkedMenuItem = optionsMenu.findItem(R.id.sub_action_sort_by_daysPassed).setChecked(true);
+        } else if (sortMode == 2) {
+            checkedMenuItem = optionsMenu.findItem(R.id.sub_action_sort_by_alertActive).setChecked(true);
         }
         if (sortInverted == 1) {
             optionsMenu.findItem(R.id. sub_action_sort_inverted).setChecked(true);
@@ -456,30 +530,54 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         int id = menuItem.getItemId();
-        // not as switch statement because 'keepMenuOpen' Method doesn't work if something is returned as required by switch statement
+        // not as switch statement because 'keepMenuOpen' Method doesn't work if 'break' as required by switch statement
         if (id == R.id.sub_action_sort_by_daysUntilAlert) {
             if (!menuItem.isChecked()) {
                 sortMode = 0;
                 sortItems();
                 SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 0);
+                //uncheck already checked item
+                if (checkedMenuItem != null) {
+                checkedMenuItem.setChecked(false); }
+                //set checkedMenuItem to current menuItem
                 menuItem.setChecked(true);
-                MenuItem checkedItem = optionsMenu.findItem(R.id.sub_action_sort_by_daysPassed);
-                checkedItem.setChecked(false);
+                checkedMenuItem = menuItem;
             }
             keepMenuOpen(menuItem);
         }
 
+
         else if (id == R.id.sub_action_sort_by_daysPassed) {
-                if (!menuItem.isChecked()) {
-                    sortMode = 1;
-                    sortItems();
-                    SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 1);
-                    menuItem.setChecked(true);
-                    MenuItem checkedItem = optionsMenu.findItem(R.id.sub_action_sort_by_daysUntilAlert);
-                    checkedItem.setChecked(false);
-                }
-                keepMenuOpen(menuItem);
-            } else if (id == R.id.sub_action_sort_inverted) {
+            if (!menuItem.isChecked()) {
+                sortMode = 1;
+                sortItems();
+                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 1);
+                //uncheck already checked item
+                if (checkedMenuItem != null) {
+                    checkedMenuItem.setChecked(false); }
+                //set checkedMenuItem to current menuItem
+                menuItem.setChecked(true);
+                checkedMenuItem = menuItem;
+            }
+            keepMenuOpen(menuItem);
+        }
+
+        else if (id == R.id.sub_action_sort_by_alertActive) {
+            if (!menuItem.isChecked()) {
+                sortMode = 2;
+                sortItems();
+                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 1);
+                //uncheck already checked item
+                if (checkedMenuItem != null) {
+                    checkedMenuItem.setChecked(false); }
+                //set checkedMenuItem to current menuItem
+                menuItem.setChecked(true);
+                checkedMenuItem = menuItem;
+
+            }
+            keepMenuOpen(menuItem);
+        }
+             else if (id == R.id.sub_action_sort_inverted) {
                 if (!menuItem.isChecked()) {
                     menuItem.setChecked(true);
                     sortInverted = 1;
@@ -499,7 +597,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.action_settings) {
                 return true;
             } else if (id == R.id.action_throw_notification) {
-                  setAlert(System.currentTimeMillis() + 1500, "Bla", 1);
+                //  setAlert(System.currentTimeMillis() + 500, "Bla", 1);
                 return true;
             }
             return super.onOptionsItemSelected(menuItem);
@@ -592,30 +690,52 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setNotification(long millis, String title, int id) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlertReceiver.class);
-        intent.putExtra("title", title);
-        intent.putExtra("id", id);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, millis, pendingIntent);
-        Toast.makeText(getApplicationContext(), "Alarm Set", Toast.LENGTH_SHORT).show();
-    }
+    public boolean setAlert(Item item, long millis_end) {
+        //only set alerts that are not in the past
+        if (millis_end - System.currentTimeMillis() >= 0) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlertReceiver.class);
+            intent.putExtra("title", item.getmTitle());
+            intent.putExtra("id", item.getmID());
+            intent.setAction("ALERT");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, item.getmID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, millis_end, pendingIntent);
 
+            //when alert is set set values in item
+            item.setmMillisEnd(millis_end);
+            item.setmAlertActive(1);
+            adapter.notifyDataSetChanged();
+            //when alert is set set values in shared prefs
+            SharedPreferencesHelper.setLong(getApplicationContext(), "millis_end_" + item.getmID(), item.getmMillisEnd());
+            SharedPreferencesHelper.setInt(getApplicationContext(), "alert_active_" + item.getmID(), 1);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(item.getmMillisEnd());
+            String time = calendar.getTime().toString();
+
+            Toast.makeText(getApplicationContext(), getString(R.string.set_alert) + time, Toast.LENGTH_LONG).show();
+            return true;
+        } else {
+            //TODO display Toast not when method is called from e.g. adapter when checkbox is clicked
+            Toast.makeText(getApplicationContext(), getString(R.string.alert_in_past), Toast.LENGTH_LONG).show();
+            return false;
+        }
+    }
 
 
     private void cancelNotification(String title, int id) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlertReceiver.class);
-        //TODO useless??
-     //   intent.putExtra("title", title);
         intent.putExtra("id", id);
+        //titel and action necessary to recreate the exact intent in order for it to be canceled
+        intent.putExtra("title", title);
+        intent.setAction("ALERT");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
         Toast.makeText(getApplicationContext(), "Alarm Canceled", Toast.LENGTH_SHORT).show();
     }
 
-
+    //TODO move to itemClass als static method with itemsList als argument
     public Item getItemByID(int ID) {
         for (int i = 0; i < itemsList.size(); i++) {
             if (itemsList.get(i).getmID() == ID) {
@@ -623,22 +743,6 @@ public class MainActivity extends AppCompatActivity {
             }
         } return null;
     }
-
-
-                    /*
-                    long now = System.currentTimeMillis();
-                    Calendar calendar = Calendar.getInstance();
-                    long later =  now + 86400000L;
-                    //calendar.setLenient(true);
-                    calendar.setTimeInMillis(later);
-                    calendar.set(Calendar.HOUR_OF_DAY, 2);
-                    calendar.set(Calendar.MINUTE, 0);
-                    calendar.set(Calendar.SECOND, 0);
-                    String time = calendar.getTime().toString();
-                    Toast.makeText(getApplicationContext(), time , Toast.LENGTH_SHORT).show();
-                   // String time = calendar.getTime().toString();
-
-                     */
 
 
 

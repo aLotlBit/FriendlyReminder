@@ -30,7 +30,7 @@ public class SharedPreferencesHelper {
             int interval = mSharedPrefs.getInt("interval_" + id, -1);
             int alertActive = mSharedPrefs.getInt("alert_active_" + id, 0);
 
-            itemsList.add(new Item(Integer.parseInt(id), title, millisStart, millisEnd, 0, 0, interval, alertActive));
+            itemsList.add(new Item(Integer.parseInt(id), title, millisStart, millisEnd, interval, alertActive));
         }
     //    mEdit.commit();
         return itemsList;
@@ -62,7 +62,7 @@ public class SharedPreferencesHelper {
             long millisEnd = mSharedPrefs.getLong("millis_end_" + id, -1);
             int alertActive = mSharedPrefs.getInt("alert_active_" + id, 0);
             if (alertActive == 1) {
-                itemsList.add(new Item(Integer.parseInt(id), title, -1, millisEnd, 0, 0, -1, 1));
+                itemsList.add(new Item(Integer.parseInt(id), title, -1, millisEnd, -1, 1));
             }
         }
       //  mEdit.commit();
@@ -73,6 +73,12 @@ public class SharedPreferencesHelper {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         Integer interval = mSharedPrefs.getInt("interval_" + id, -1);
         return interval;
+    }
+
+    static long getMillisEnd(Context mContext, Integer id) {
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        Long millisEnd = mSharedPrefs.getLong("millis_end_" + id, -1);
+        return millisEnd;
     }
 
     static void setString(Context context, String key, String value) {

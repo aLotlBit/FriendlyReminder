@@ -1,11 +1,12 @@
 <resources>
-    <string name="app_name">RegularReminder</string>
+    <string name="app_name">Repeat Reminder</string>
 
     <!-- menu items -->
     <string name="action_settings">Settings</string>
     <string name="action_sort_by">Sort by</string>
-    <string name="sub_action_sort_by_daysUntilAlert">Days Until Alert</string>
-    <string name="sub_action_sort_by_daysPassed">Days passed</string>
+    <string name="sub_action_sort_by_daysUntilAlert">Time Until Alert</string>
+    <string name="sub_action_sort_by_daysPassed">Time Passed</string>
+    <string name="sub_action_sort_by_alertActive">Alert Active</string>
     <string name="sub_action_sort_inverted">Inverted</string>
     <string name="action_clear_all_data">Clear all data</string>
 
@@ -19,6 +20,10 @@
     <string name="dialog_btn_positve">OK</string>
     <string name="dialog_btn_cancel">Cancel</string>
 
+    <!-- Toast messages -->
+    <string name="set_alert">Set Alert To:</string>
+    <string name="alert_in_past">Alert cannot be set in past</string>
+    <string name="no_title">Enter Title!</string>
 
 
     <!-- List item strings -->
@@ -35,5 +40,20 @@
     <string name="interval_multi_days">days</string>
 
     <string name="btn_delete">Delete</string>
+
+    <!-- notifications -->
+    <string name="btn_restart">Restart</string>
+    <string name="btn_plus_one_day">+ 1d</string>
+    <string name="btn_plus_3h">+ 3h</string>
+
+
+    <!-- intent actions -->
+    <string name="alert">ACTION_ALERT</string>
+    <string name="restart">ACTION_RESTART</string>
+    <string name="restart_running">RESTART_RUNNING</string>
+    <string name="disable_alert_active">DISABLE_RUNNING</string>
+    <string name="plus_one_day">PLUS_ONE_DAY</string>
+
+
 
 </resources>
