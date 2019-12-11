@@ -2,17 +2,32 @@
 <resources>
     <dimen name="fab_margin">8dp</dimen>
 
-    <dimen name="small_margin">16dp</dimen>
-    <dimen name="medium_margin">22dp</dimen>
-    <dimen name="large_margin">28dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_none">0dp</dimen>
+    <dimen name="margin_left">24dp</dimen>
+    <dimen name="margin_right">24dp</dimen>
+
+
 
     <dimen name="padding_small">8dp</dimen>
-    <dimen name="padding_medium">20dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_large">28dp</dimen>
 
     <dimen name="font_small">6sp</dimen>
     <dimen name="font_medium">11sp</dimen>
     <dimen name="font_large">24sp</dimen>
+
+    <dimen name="font_size_alertInfoShown">20sp</dimen>
+    <dimen name="font_size_alertInfoHidden">11sp</dimen>
+
+
+
+    <dimen name="width_none">0dp</dimen>
+    <dimen name="height_none">0dp</dimen>
+
+
 
 
 </resources>

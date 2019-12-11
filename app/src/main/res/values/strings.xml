@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Repeat Reminder</string>
+    <string name="app_name">Remind&amp;Repeat</string>
 
     <!-- menu items -->
     <string name="action_settings">Settings</string>
@@ -9,6 +9,7 @@
     <string name="sub_action_sort_by_alertActive">Alert Active</string>
     <string name="sub_action_sort_inverted">Inverted</string>
     <string name="action_clear_all_data">Clear all data</string>
+    <string name="action_change_theme">Dark Theme</string>
 
     <!-- dialog messages -->
     <string name="title_new">Enter Title</string>
@@ -33,9 +34,9 @@
     <string name="alert_today">Today</string>
     <string name="alert_one_day_ago">Yesterday</string>
     <string name="alert_multi_days_ago">days ago</string>
+    <string name="alert_not_set">Days until alert</string>
 
-    <string name="interval_first_part">Interval:</string>
-    <string name="interval_not_set">None set</string>
+    <string name="interval_not_set">Interval</string>
     <string name="interval_one_day">day</string>
     <string name="interval_multi_days">days</string>
 

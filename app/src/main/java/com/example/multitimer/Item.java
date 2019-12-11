@@ -24,17 +24,17 @@ public class Item {
 
         private int mMinuteOfDay;
 
-        private int mAlertActive;
+        private int mAlertStatus;
 
         private boolean mExpanded;
 
-    public Item(Integer mID, String mTitle, long mMillisStart, long mMillisEnd , int mInterval, int mAlertActive) {
+    public Item(Integer mID, String mTitle, long mMillisStart, long mMillisEnd , int mInterval, int mAlertStatus) {
         this.mID = mID;
         this.mTitle = mTitle;
         this.mMillisStart = mMillisStart;
         this.mMillisEnd = mMillisEnd;
         this.mInterval = mInterval;
-        this.mAlertActive = mAlertActive;
+        this.mAlertStatus = mAlertStatus;
         this.mExpanded = false;
 
         Calendar calendar = Calendar.getInstance();
@@ -54,19 +54,19 @@ public class Item {
 
         public String getmTitle() {
         return mTitle;
-    }
+        }
 
         public void setmTitle(String mTitle) {
         this.mTitle = mTitle;
-    }
+        }
 
         public long getmMillisStart() {
         return mMillisStart;
-    }
+        }
 
         public void setmMillisStart(long mMillisStart) {
         this.mMillisStart = mMillisStart;
-    }
+        }
 
         public long getmMillisEnd() {
         return mMillisEnd; }
@@ -85,11 +85,11 @@ public class Item {
 
         public void setmMinuteOfDay(int mMinuteOfDay) {
         this.mMinuteOfDay = mMinuteOfDay;
-    }
+        }
 
         public int getmMinuteOfDay() {
         return mMinuteOfDay;
-    }
+        }
 
         public void setmInterval(int mInterval) {
         this.mInterval = mInterval;
@@ -99,17 +99,9 @@ public class Item {
         return mInterval;
         }
 
-        public void setmAlertActive(int mAlertActive) {this.mAlertActive = mAlertActive; }
+        public void setmAlertStatus(int mAlertStatus) {this.mAlertStatus = mAlertStatus; }
 
-        public boolean getmAlertActive() {
-        boolean active;
-        if (mAlertActive == 0) {
-                active = false;
-            } else {
-                active = true;
-            }
-                return active;
-        }
+        public int getmAlertStatus() { return mAlertStatus; }
 
         public void setmExpanded(boolean mExpanded)  {this.mExpanded = mExpanded; };
         public boolean getmExpanded() {return mExpanded; }
@@ -205,17 +197,12 @@ public class Item {
         }
     }
 
-    public static class CompAlertActive implements Comparator<Item> {
+    public static class CompAlertStatus implements Comparator<Item> {
         @Override
         public int compare(Item i1, Item i2) {
-            int active1;
-            int active2;
-            if (i1.getmAlertActive()) {active1 = 1;}
-            else {active1 = 0;}
-            if (i2.getmAlertActive()) {active2 = 1;}
-            else {active2 = 0;}
 
-            return (int) active1 - active2;
+
+            return (int) i1.getmAlertStatus() - i2.getmAlertStatus();
         }
     }
 

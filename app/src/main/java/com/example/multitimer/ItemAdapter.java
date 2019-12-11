@@ -1,6 +1,7 @@
 package com.example.multitimer;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,11 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.security.acl.Group;
@@ -57,12 +61,28 @@ public class ItemAdapter extends ArrayAdapter<Item> {
             holder.tv_daysPassed = convertView.findViewById(R.id.tv_days_passed);
             holder.tv_daysUntilAlert = convertView.findViewById(R.id.tv_days_left);
             holder.tv_timeOfDay = convertView.findViewById(R.id.tv_time_of_day);
+            holder.tv_daysUntilAlertShown = convertView.findViewById(R.id.tv_days_left_shown);
+            holder.tv_timeOfDayShown = convertView.findViewById(R.id.tv_time_of_day_shown);
+
 
             holder.tv_title.setText(currentItem.getmTitle());
             holder.tv_daysPassed.setText(currentItem.getDaysPassed());
+
+            holder.tv_daysUntilAlertShown.setText(getStringForTvDaysUntilAlert(currentItem));
+
+        //TODO ALertStatus
+
+        //only show timeOfDay in nonExpanded view when there is an upcoming alert
+            if (currentItem.getmMillisEnd() < System.currentTimeMillis()) {
+                holder.tv_timeOfDayShown.setVisibility(View.INVISIBLE);
+            } else {
+                holder.tv_timeOfDayShown.setText(" " + getStringForTvTimeOfDay(currentItem));
+                holder.tv_timeOfDayShown.setVisibility(View.VISIBLE);
+            }
+
+
             holder.tv_daysUntilAlert.setText(getStringForTvDaysUntilAlert(currentItem));
             holder.tv_timeOfDay.setText(getStringForTvTimeOfDay(currentItem));
-
             holder.tv_interval = convertView.findViewById(R.id.tv_interval);
             holder.cb_alertActive = convertView.findViewById(R.id.cb_alert_active);
 
@@ -71,6 +91,20 @@ public class ItemAdapter extends ArrayAdapter<Item> {
             holder.ivArrow = convertView.findViewById(R.id.iv_arrow);
             holder.tv_delete = convertView.findViewById(R.id.tv_delete);
             holder.tv_restart = convertView.findViewById(R.id.tv_reset);
+
+            //TODO ALertStatus
+            if (currentItem.getmAlertStatus() == 1) {
+                holder.ivAlarm.setImageResource(R.drawable.alert);
+                holder.tv_daysUntilAlertShown.setTextColor(getColorByAttributeId(mContext, R.attr.colorTextRegular));
+                holder.tv_timeOfDayShown.setTextColor(getColorByAttributeId(mContext, R.attr.colorTextRegular));
+            } else if (currentItem.getmMillisEnd() >= System.currentTimeMillis()){
+                holder.ivAlarm.setImageResource(R.drawable.alert_off);
+                //TODO set to textStyle
+                  holder.tv_daysUntilAlertShown.setTextColor(getColorByAttributeId(mContext, R.attr.colorTextGrayed));
+                  holder.tv_timeOfDayShown.setTextColor(getColorByAttributeId(mContext, R.attr.colorTextGrayed));
+            } else {
+                holder.ivAlarm.setImageResource(R.drawable.alert_active);
+            }
 
             holder.tv_interval.setText(getStringForTvInterval(currentItem));
             holder.cb_alertActive.setChecked(currentItem.getmAlertActive());
@@ -87,7 +121,8 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                         item.setmAlertActive(0);
                         SharedPreferencesHelper.setInt(mContext, "alert_active_" + currentItem.getmID(), 0);
                         ((MainActivity) mContext).cancelAlert(currentItem.getmTitle(), currentItem.getmID());
-                        //setNotification returns true when millisEnd is not in past and alert is set
+                        notifyDataSetChanged();
+                        //setAlert returns true when millisEnd is not in past and alert is set
                     } else if (!((MainActivity) mContext).setAlert(currentItem, currentItem.getmMillisEnd())) {
                         holder.cb_alertActive.setChecked(false);
                         if (currentItem.getmInterval() == -1) {
@@ -170,13 +205,13 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 holder.tv_timeOfDay.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_small));
                 //TODO why does is textsize differen when set with xml?
                 holder.tv_interval.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
-                holder.ivAlarm.setImageResource(R.drawable.notification);
+          //      holder.ivAlarm.setImageResource(R.drawable.notification);
                 holder.ivArrow.setImageResource((R.drawable.arrow_down));
-                holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.timer, 0, 0, 0);
+          //      holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.timer, 0, 0, 0);
                 holder.tv_title.setClickable(false);
                 holder.tv_daysUntilAlert.setClickable(false);
                 holder.tv_timeOfDay.setClickable(false);
-                convertView.setBackgroundColor(0xffffffff);
+                convertView.setBackgroundColor(getColorByAttributeId(mContext, R.attr.colorBackground));
 
             } else {
                 holder.groupExpanded.setVisibility(View.VISIBLE);
@@ -184,18 +219,31 @@ public class ItemAdapter extends ArrayAdapter<Item> {
                 holder.tv_timeOfDay.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
                 //TODO why does is textsize differen when set with xml?
                 holder.tv_interval.setTextSize(TypedValue.COMPLEX_UNIT_SP, mContext.getResources().getDimension(R.dimen.font_medium));
-                holder.ivAlarm.setImageResource(R.drawable.edit);
+         //       holder.ivAlarm.setImageResource(R.drawable.edit);
                 holder.ivArrow.setImageResource((R.drawable.arrow_up));
-                holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.refresh, 0, 0, 0);
+
+         //       holder.tv_daysPassed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.refresh, 0, 0, 0);
                 holder.tv_title.setClickable(true);
                 holder.tv_daysUntilAlert.setClickable(true);
                 holder.tv_timeOfDay.setClickable(true);
 
-                convertView.setBackgroundColor(0xffcccccc);
+                convertView.setBackgroundColor(getColorByAttributeId(mContext, R.attr.colorBackgroundSelected));
             }
 
         return convertView;
     }
+
+    @ColorInt
+    public int getColorByAttributeId(Context context, @AttrRes int attrIdForColor){
+        TypedValue typedValue = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(attrIdForColor, typedValue, true);
+        return typedValue.data;
+    }
+
+
+
+
 
     //only loads expanded items when convertView != null; BUT expanding after launch doesn't work.
     /*
@@ -388,7 +436,12 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         } else if (daysUntilAlert == 0){
             string = mContext.getString(R.string.alert_today);
         } else if (daysUntilAlert == -1) {
-            string = mContext.getString(R.string.alert_one_day_ago);
+            if (item.getmMillisEnd() != -1) {
+                string = mContext.getString(R.string.alert_one_day_ago);
+            } else {
+                string = mContext.getString(R.string.alert_not_set);
+
+            }
         } else {
             string =  daysUntilAlert * -1 +  " " + mContext.getString(R.string.alert_multi_days_ago);
         }
@@ -410,11 +463,11 @@ public class ItemAdapter extends ArrayAdapter<Item> {
         int interval = item.getmInterval();
         String string = new String();
         if (interval == -1) {
-            string = mContext.getString(R.string.interval_first_part) + " " + mContext.getString(R.string.interval_not_set);
+            string = mContext.getString(R.string.interval_not_set);
         } else if (interval == 1) {
-            string = mContext.getString(R.string.interval_first_part) + " " + interval + " " + mContext.getString(R.string.interval_one_day);
+            string = interval + " " + mContext.getString(R.string.interval_one_day);
         } else {
-            string = mContext.getString(R.string.interval_first_part) + " " + interval + " " + mContext.getString(R.string.interval_multi_days);
+            string = interval + " " + mContext.getString(R.string.interval_multi_days);
         }
         return string;
     }
@@ -425,17 +478,20 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 class ViewHolder {
     protected TextView tv_title;
     protected TextView tv_daysPassed;
-    protected TextView tv_daysUntilAlert;
+    protected TextView tv_daysUntilAlertShown;
+    protected TextView tv_timeOfDayShown;
 
+    protected TextView tv_daysUntilAlert;
     protected TextView tv_timeOfDay;
     protected TextView tv_interval;
     protected CheckBox cb_alertActive;
-    protected TextView tv_restart;
 
     protected ImageView ivAlarm;
     protected ImageView ivArrow;
     protected View groupExpanded;
     protected TextView tv_delete;
+    protected TextView tv_restart;
+
 }
 
 

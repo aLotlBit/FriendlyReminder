@@ -65,11 +65,23 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem checkedMenuItem;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        if(SharedPreferencesHelper.getTheme(getApplicationContext()) == 1) {
+            setTheme(R.style.DarkTheme);
+        } else {
+            setTheme(R.style.LightTheme);
+        }
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
 
         final ListView listView = (ListView) findViewById(R.id.listView);
 
@@ -85,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
         sortItems();
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
 
@@ -219,7 +230,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "CONTENT Received");
                     int id_4 = intent.getIntExtra("id", -1);
                     Item item_4 = getItemByID(id_4);
-                    expandListItem(item_4);
+                    //check if item is already expanded
+                    if (item_4 != expandedItem) expandListItem(item_4);
                     break;
             }
         }
@@ -477,6 +489,10 @@ public class MainActivity extends AppCompatActivity {
         final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
         timePicker.setIs24HourView(true);
 
+        Calendar calendar = Calendar.getInstance();
+
+        timePicker.setMinute(calendar.get(Calendar.MINUTE) + 1);
+
         builder.setView(dialogView);
 
         builder.setMessage(getString(R.string.time_of_day_change));
@@ -524,6 +540,10 @@ public class MainActivity extends AppCompatActivity {
         if (sortInverted == 1) {
             optionsMenu.findItem(R.id. sub_action_sort_inverted).setChecked(true);
         }
+        if (SharedPreferencesHelper.getTheme(getApplicationContext()) == 1) {
+            optionsMenu.findItem(R.id.action_change_theme).setChecked(true);
+        }
+
         return true;
     }
 
@@ -597,8 +617,23 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.action_settings) {
                 return true;
             } else if (id == R.id.action_throw_notification) {
-                //  setAlert(System.currentTimeMillis() + 500, "Bla", 1);
+            //  setAlert(System.currentTimeMillis() + 500, "Bla", 1);
                 return true;
+            } else if (id == R.id.action_change_theme) {
+            if (!menuItem.isChecked()){
+                 setTheme(R.style.DarkTheme);
+                 menuItem.setChecked(false);
+                 SharedPreferencesHelper.setInt(getApplicationContext(), "theme", 1);
+                 MainActivity.this.recreate();
+                } else {
+                    setTheme(R.style.LightTheme);
+                    menuItem.setChecked(true);
+                    SharedPreferencesHelper.setInt(getApplicationContext(), "theme", 0);
+                    MainActivity.this.recreate();
+
+                }
+
+
             }
             return super.onOptionsItemSelected(menuItem);
         }

@@ -46,6 +46,11 @@ public class SharedPreferencesHelper {
         return mSharedPrefs.getInt("sort_inverted", 0);
     }
 
+    static int getTheme(Context mContext) {
+        SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        return mSharedPrefs.getInt("theme", 0);
+    }
+
     static ArrayList<Item> getItemsWithActiveAlerts(Context mContext) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
      //   SharedPreferences.Editor mEdit = mSharedPrefs.edit();
