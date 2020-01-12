@@ -1,4 +1,4 @@
-# FriendlyReminder
+# Friendly Reminder
 
 With this app you can set up reminders for actions that need to be repeated in a given interval 
 (e.g. feed your snake or replace your contact lenses). The advantage to using a calendar is 
