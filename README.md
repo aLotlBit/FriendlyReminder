@@ -7,6 +7,8 @@ with the given interval or repeated later in case you don't have time to perform
 Reminders will be highlighted until marked 'seen' or restarted.
 
 
+Screenshots:
+
 [Startup View](screenshots/screenshot1.png)
 
 [Notification](screenshots/screenshot2.png)
