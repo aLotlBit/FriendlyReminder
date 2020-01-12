@@ -9,13 +9,13 @@ Reminders will be highlighted until marked 'seen' or restarted.
 
 Screenshots:
 
-[Startup View](screenshots/screenshot1.png)
+![Startup View](screenshots/screenshot1.png)
 
-[Notification](screenshots/screenshot2.png)
+![Notification](screenshots/screenshot2.png)
 
-[Highlighted Reminder](screenshots/screenshot3.png)
+![Highlighted Reminder](screenshots/screenshot3.png)
 
-[Sort Options](screenshots/screenshot4.png)
+![Sort Options](screenshots/screenshot4.png)
 
 
 
