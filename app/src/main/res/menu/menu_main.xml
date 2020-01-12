@@ -7,4 +7,56 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_throw_notification"
+        android:orderInCategory="100"
+        android:title="Throw Notification"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_sort_by"
+        android:orderInCategory="100"
+        android:title="@string/action_sort_by"
+        app:showAsAction="never" >
+
+        <menu>
+            <item
+                android:id="@+id/sub_action_sort_by_daysUntilAlert"
+                android:title="@string/sub_action_sort_by_daysUntilAlert"
+                android:checkable="true"
+                app:showAsAction="never"/>
+
+            <item
+                android:id="@+id/sub_action_sort_by_daysPassed"
+                android:title="@string/sub_action_sort_by_daysPassed"
+                android:checkable="true"
+                app:showAsAction="never"/>
+            <item
+                android:id="@+id/sub_action_sort_by_alertActive"
+                android:title="@string/sub_action_sort_by_alertActive"
+                android:checkable="true"
+                app:showAsAction="never"/>
+
+            <item
+                android:id="@+id/sub_action_sort_inverted"
+                android:title="@string/sub_action_sort_inverted"
+                android:checkable="true"
+                app:showAsAction="never"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_clear_all_data"
+        android:orderInCategory="100"
+        android:title="@string/action_clear_all_data"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_change_theme"
+        android:orderInCategory="100"
+        android:title="@string/action_change_theme"
+        android:checkable="true"
+        app:showAsAction="never" />
+
 </menu>

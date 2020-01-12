@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorIcon" format="reference"/>
+
+    <attr name="colorBackground" format="reference"/>
+    <attr name="colorBackgroundSelected" format="reference"/>
+
+    <attr name="tintFloatingActionBtn" format="reference"/>
+    <attr name="bgdTintFloatingActionBtn" format="reference"/>
+
+    <attr name="colorTextRegular" format="reference"/>
+    <attr name="colorTextGrayed" format="reference"/>
+    <attr name="colorListViewDivider" format="reference"/>
+
+
+
+
+
+</resources>
