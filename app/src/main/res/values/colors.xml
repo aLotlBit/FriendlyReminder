@@ -1,41 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- light theme colors -->
-    <color name="colorPrimary">#EF6C00</color>
-    <color name="colorPrimaryDark">#D84315</color>
-    <color name="colorAccent">#D84315</color>
-    <color name="colorIcon">#97928F</color>
-    <color name="colorBackground">#A3EEE4E1</color>
-    <color name="colorBackgroundSelected">#2FEBA771</color>
-    <color name="tintFloatingActionBtn">#6F3303</color>
-    <color name="bgdTintFloatingActionBtn">#FF8F00</color>
-    <color name="colorTextRegular">#AC172522</color>
-    <color name="colorTextGrayed">#40172522</color>
-    <color name="colorListViewDivider">#2E000000</color>
-
-
-
-    <color name="textColorPrimary">#000000</color>
-    <color name="text_regular">#000000</color>
-    <color name="text_grayed_out">#44000000</color>
-
-
-    <color name="darkColorPrimary">#7800695C</color>
-    <color name="darkColorPrimaryDark">#00695C</color>
-    <color name="darkColorAccent">#91D6D4E4</color>
-    <color name="darkColorIcon">#D8D5D1</color>
-    <color name="darkColorBackground">#F3050C0B</color>
-    <color name="darkColorBackgroundSelected">#1500695C</color>
-    <color name="darkTintFloatingActionBtn">#D8D5D1</color>
-    <color name="darkBgdTintFloatingActionBtn">#00695C</color>
-
-    <color name="darkColorTextRegular">#E1ECEA</color>
-    <color name="darkColorTextGrayed">#788381</color>
-    <color name="darkColorListViewDivider">#3CDEECEA</color>
-
-
-
-
-
-
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
 </resources>

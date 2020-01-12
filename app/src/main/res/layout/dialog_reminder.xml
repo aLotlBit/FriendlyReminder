@@ -7,8 +7,8 @@
 
     <RelativeLayout
         android:id="@+id/days_passed_layout"
-        android:layout_marginStart="@dimen/margin_medium"
-        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/medium_margin"
+        android:layout_marginEnd="@dimen/medium_margin"
         android:layout_width="fill_parent"
         android:layout_height="80dp"
         android:orientation="horizontal">
@@ -35,16 +35,64 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
     <View
         android:layout_width="match_parent"
-        android:layout_marginLeft="@dimen/margin_small"
-        android:layout_marginRight="@dimen/margin_small"
+        android:layout_marginLeft="@dimen/small_margin"
+        android:layout_marginRight="@dimen/small_margin"
         android:layout_height="1dp"
         android:background="#000"
         android:padding="@dimen/padding_medium"/>
+
+    <RelativeLayout
+        android:layout_above="@+id/days_passed_layout"
+        android:layout_marginStart="@dimen/medium_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/padding_medium" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="@dimen/font_medium"
+            android:id="@+id/notification_text"
+            android:paddingBottom="@dimen/padding_medium"
+            android:text="Notification:" />
+
+
+        <LinearLayout
+            android:id="@+id/interval_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/notification_text"
+
+            >
+
+            <TextView
+                android:layout_gravity="left"
+                android:layout_weight="1"
+
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_small"
+                android:text="Interval"
+                />
+
+            <Button
+                android:id="@+id/btn_set_interval"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_small"
+                android:text="Set"
+                />
+
+        </LinearLayout>
 
 
         <TextView
@@ -52,36 +100,78 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:textSize="@dimen/font_medium"
-            android:id="@+id/notification_heading"
+            android:id="@+id/reminder_text"
             android:paddingBottom="@dimen/padding_medium"
             android:text="Notification:" />
 
-        <Button
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_notification_setting"
-            android:text="set"/>
 
+        <LinearLayout
+            android:id="@+id/time_of_day_Layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/interval_layout"
+
+            >
+
+            <TextView
+                android:layout_gravity="left"
+                android:layout_weight="1"
+
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_small"
+                android:text="Time"
+                />
+
+            <Button
+                android:id="@+id/btn_set_time_of_day"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_small"
+                android:text="Foo2"
+                />
+
+        </LinearLayout>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/notification_heading"
+            android:orientation="horizontal"
+            android:layout_alignParentRight="true"
+            android:id="@+id/reminder_layout1"
+            android:layout_below="@+id/time_of_day_Layout"
+
             >
 
             <TextView
-                android:id="@+id/tv_days_left"
                 android:layout_gravity="left"
+                android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_small"
-                android:text="Days Left" />
+                android:text="Days Left:"
 
+                />
 
+            <TextView
+                android:id="@+id/tv_days_left"
+                android:layout_gravity="right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_small"
+                android:text="Foo"
+
+                />
 
         </LinearLayout>
+
+
+
 
     </RelativeLayout>
 
