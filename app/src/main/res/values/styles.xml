@@ -1,31 +1,76 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="DarkTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+        <item name="colorIcon">@color/darkColorIcon</item>
+        <item name="colorBackground">@color/darkColorBackground</item>
+        <item name="colorBackgroundSelected">@color/darkColorBackgroundSelected</item>
+        <item name="bgdTintFloatingActionBtn">@color/darkBgdTintFloatingActionBtn</item>
+        <item name="tintFloatingActionBtn">@color/darkTintFloatingActionBtn</item>
+        <item name="colorTextRegular">@color/darkColorTextRegular</item>
+        <item name="colorTextGrayed">@color/darkColorTextGrayed</item>
+        <item name="colorListViewDivider">@color/darkColorListViewDivider</item>
+
+
+
+
+    </style>
+
+    <style name="DarkTheme.NoActionBar">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="DarkTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="DarkTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+
+
+    <style name="LightTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorIcon">@color/colorIcon</item>
+        <item name="colorBackground">@color/colorBackground</item>
+        <item name="colorBackgroundSelected">@color/colorBackgroundSelected</item>
+        <item name="tintFloatingActionBtn">@color/tintFloatingActionBtn</item>
+        <item name="bgdTintFloatingActionBtn">@color/bgdTintFloatingActionBtn</item>
+
+        <item name="colorTextRegular">@color/colorTextRegular</item>
+        <item name="colorTextGrayed">@color/colorTextGrayed</item>
+        <item name="colorListViewDivider">@color/colorListViewDivider</item>
+
+
+
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="LightTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="LightTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="LightTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
     <!-- added -->
+
     <style name="Divider">
         <item name="android:background">?android:attr/listDivider</item> //you can give your color here. that will change all divider color in your app.
+
     </style>
 
     <style name="Divider.Horizontal" parent="Divider">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">5dp</item> // You can change thickness here.
+        <item name="android:layout_marginLeft">@dimen/margin_medium</item>
+        <item name="android:layout_marginRight">@dimen/margin_medium</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">10dp</item> // You can change thickness here.
 
     </style>
 
@@ -33,5 +78,58 @@
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
     </style>
+
+    <style name="styleContentMain">
+        <item name="android:background">?attr/colorBackground</item>
+    </style>
+
+
+    <style name="listViewStyle" parent="Widget.AppCompat.ListView">
+        <item name="android:background">?attr/colorBackground</item>
+        <item name="android:layout_width">@dimen/width_none</item>
+        <item name="android:layout_height">@dimen/height_none</item>
+        <item name="android:layout_marginStart">@dimen/margin_none</item>
+        <item name="android:layout_marginEnd">@dimen/margin_none</item>
+        <item name="android:layout_marginTop">@dimen/margin_none</item>
+        <item name="android:layout_marginBottom">@dimen/margin_none</item>
+        <item name="android:divider">@drawable/list_divider</item>
+    </style>
+
+
+
+    <style name="styleIcon" >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/margin_left</item>
+        <item name="android:tint">?attr/colorIcon </item>
+    </style>
+
+    <style name="styleIcon.arrow">
+        <item name="android:layout_marginBottom">@dimen/margin_small</item>
+    </style>
+
+    <style name="styleFloatingActionBtn">
+        <item name="android:elevation">25dp</item>
+
+        <item name="android:tint">?attr/tintFloatingActionBtn </item>
+        <item name="android:backgroundTint">?attr/bgdTintFloatingActionBtn </item>
+    </style>
+
+    <style name="styleText">
+        <item name="android:textColor">?attr/colorTextRegular</item>
+    </style>
+
+    <style name="styleText.alertInfoShown">
+        <item name="android:textSize">@dimen/font_size_alertInfoShown</item>
+    </style>
+
+    <style name="styleText.alertInfoHidden">
+        <item name="android:textSize">@dimen/font_size_alertInfoHidden</item>
+    </style>
+
+
+
+
+
 
 </resources>
