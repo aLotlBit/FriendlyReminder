@@ -11,9 +11,7 @@
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
         android:gravity="center_horizontal"
-        android:inputType="textNoSuggestions"
-
-        />
+        android:inputType="text" />
 
 
 

@@ -34,11 +34,11 @@ public class AlertReceiver extends BroadcastReceiver {
                     String title = intent.getStringExtra("title");
                     int id = intent.getIntExtra("id", 0);
                     NotificationHelper notificationHelper = new NotificationHelper(context);
-                    NotificationCompat.Builder nb = notificationHelper.getChannelNotification(title, "Yiss!!!", id);
+                    NotificationCompat.Builder nb = notificationHelper.getChannelNotification(title, "", id);
                     notificationHelper.getManager().notify(id, nb.build());
-                    //disable alertActive for item after alert in sharedPrefs
-                    SharedPreferencesHelper.setInt(context, "alert_active_" + id, 0);
-                    //intent to disable alertActive in Item when app is open
+                    //set AlertStatus for item to "alert ringing and not marked seen (4)" after alert in sharedPrefs
+                    SharedPreferencesHelper.setInt(context, "alert_status_" + id, 4);
+                    //intent to set alertStaus in Item when app is open
                     Intent reset_intent = new Intent("DISABLE_ALERT_ACTIVE");
                     reset_intent.putExtra("id", id);
                     context.sendBroadcast(reset_intent);
@@ -50,43 +50,19 @@ public class AlertReceiver extends BroadcastReceiver {
                     String title_1 = intent.getStringExtra("title");
 
                     int interval = SharedPreferencesHelper.getIntervalForReset(context, id_1);
-                    long millis_end = System.currentTimeMillis() + Item.daysToMillis(interval);
+                    long millis_end_old = SharedPreferencesHelper.getMillisEnd(context, id_1);
+
+                    long millis_end = millis_end_old + Item.daysToMillis(interval);
                     SharedPreferencesHelper.setLong(context, "millis_end_" + id_1, millis_end);
                     SharedPreferencesHelper.setLong(context, "millis_start_" + id_1, System.currentTimeMillis());
-                    SharedPreferencesHelper.setInt(context, "alert_active_" + id_1, 1);
-
+                    SharedPreferencesHelper.setInt(context, "alert_status_" + id_1, 3);
                     setAlert(context, id_1, title_1, millis_end);
-
-                    /*
-                    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                    Intent newIntent = new Intent(context, AlertReceiver.class);
-                    newIntent.putExtra("title", title_1);
-                    newIntent.putExtra("id", id_1);
-                    newIntent.setAction("ALERT");
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id_1, newIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, millis_end, pendingIntent);
-
-                     */
 
                     //resets values in item when app is open
                     sendIntentToMain(context, "RESTART_RUNNING", id_1);
-                    /*
-                    Intent reset_intent_1 = new Intent("RESTART_RUNNING");
-                    reset_intent_1.putExtra("id", id_1);
-                    context.sendBroadcast(reset_intent_1);
-
-                     */
-
                     //cancel notification when restart button is clicked
                     cancelNotification(context, id_1);
-                    /*
-                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(id_1);
-
-                     */
-
                     Log.d(TAG, "RestartIntent Received");
-
                     break;
 
                 case "PLUS_ONE_DAY":
@@ -97,25 +73,11 @@ public class AlertReceiver extends BroadcastReceiver {
                     long millis_end_2 = SharedPreferencesHelper.getMillisEnd(context, id_2) + ONE_DAY;
 
                     SharedPreferencesHelper.setLong(context, "millis_end_" + id_2, millis_end_2);
-                    SharedPreferencesHelper.setInt(context, "alert_active_" + id_2, 1);
+                    SharedPreferencesHelper.setInt(context, "alert_status_" + id_2, 3);
 
                     setAlert(context, id_2, title_2, millis_end_2);
                     sendIntentToMain(context, "PLUS_ONE_DAY", id_2);
                     cancelNotification(context, id_2);
-
-
-
-                    /*
-                    AlarmManager alarmManager_2 = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                    Intent plusOneDayIntent = new Intent(context, AlertReceiver.class);
-                    plusOneDayIntent.putExtra("title", title_2);
-                    plusOneDayIntent.putExtra("id", id_2);
-                    plusOneDayIntent.setAction("ALERT");
-                    PendingIntent plusOneDayPending = PendingIntent.getBroadcast(context, id_2, plusOneDayIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager_2.set(AlarmManager.RTC_WAKEUP, millis_end_2, plusOneDayPending);
-
-                     */
-
                     break;
 
                 case "PLUS_3H":
@@ -125,24 +87,11 @@ public class AlertReceiver extends BroadcastReceiver {
                     long millis_end_3 = SharedPreferencesHelper.getMillisEnd(context, id_3) + THREE_HOURS;
 
                     SharedPreferencesHelper.setLong(context, "millis_end_" + id_3, millis_end_3);
-                    SharedPreferencesHelper.setInt(context, "alert_active_" + id_3, 1);
+                    SharedPreferencesHelper.setInt(context, "alert_status_" + id_3, 3);
 
                     setAlert(context, id_3, title_3, millis_end_3);
                     sendIntentToMain(context, "PLUS_THREE_HOURS", id_3);
                     cancelNotification(context, id_3);
-
-
-                    /*
-                    AlarmManager alarmManager_3 = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                    Intent plus3hIntent = new Intent(context, AlertReceiver.class);
-                    plus3hIntent.putExtra("title", title_3);
-                    plus3hIntent.putExtra("id", id_3);
-                    plus3hIntent.setAction("ALERT");
-                    PendingIntent plus3hPending = PendingIntent.getBroadcast(context, id_2, plus3hIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager_3.set(AlarmManager.RTC_WAKEUP, millis_end_2, plus3hPending);
-
-                     */
-
                     break;
 
                 case "CONTENT":

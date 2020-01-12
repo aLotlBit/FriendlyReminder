@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- light theme colors -->
-    <color name="colorPrimary">#EF6C00</color>
-    <color name="colorPrimaryDark">#D84315</color>
-    <color name="colorAccent">#D84315</color>
-    <color name="colorIcon">#97928F</color>
-    <color name="colorBackground">#A3EEE4E1</color>
-    <color name="colorBackgroundSelected">#2FEBA771</color>
-    <color name="tintFloatingActionBtn">#6F3303</color>
-    <color name="bgdTintFloatingActionBtn">#FF8F00</color>
-    <color name="colorTextRegular">#AC172522</color>
-    <color name="colorTextGrayed">#40172522</color>
+    <color name="colorPrimary">#32648B</color>
+    <color name="colorPrimaryDark">#E432648B</color>
+    <color name="colorAccent">#28679B</color>
+    <color name="colorIcon">#2A333A</color>
+    <color name="colorBackground">#DFE4E9</color>
+    <color name="colorBackgroundSelected">#1C32648B</color>
+    <color name="tintFloatingActionBtn">#D8D5D1</color>
+    <color name="bgdTintFloatingActionBtn">#32648B</color>
+    <color name="colorTextRegular">#AE303233</color>
+    <color name="colorTextGrayed">#A4A8AA</color>
     <color name="colorListViewDivider">#2E000000</color>
+    <color name="colorSeparator">#2E000000</color>
 
 
 
@@ -20,18 +21,19 @@
     <color name="text_grayed_out">#44000000</color>
 
 
-    <color name="darkColorPrimary">#7800695C</color>
-    <color name="darkColorPrimaryDark">#00695C</color>
-    <color name="darkColorAccent">#91D6D4E4</color>
-    <color name="darkColorIcon">#D8D5D1</color>
-    <color name="darkColorBackground">#F3050C0B</color>
-    <color name="darkColorBackgroundSelected">#1500695C</color>
+    <color name="darkColorPrimary">#9F32648B</color>
+    <color name="darkColorPrimaryDark">#BB376385</color>
+    <color name="darkColorAccent">#E828679B</color>
+    <color name="darkColorIcon">#D2DDE6</color>
+    <color name="darkColorBackground">#243038</color>
+    <color name="darkColorBackgroundSelected">#1C32648B</color>
     <color name="darkTintFloatingActionBtn">#D8D5D1</color>
-    <color name="darkBgdTintFloatingActionBtn">#00695C</color>
-
+    <color name="darkBgdTintFloatingActionBtn">#32648B</color>
     <color name="darkColorTextRegular">#E1ECEA</color>
     <color name="darkColorTextGrayed">#788381</color>
-    <color name="darkColorListViewDivider">#3CDEECEA</color>
+    <color name="darkColorListViewDivider">#2CE1E8EE</color>
+    <color name="darkColorSeparator">#6DDBE7F0</color>
+
 
 
 

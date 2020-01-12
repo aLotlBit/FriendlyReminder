@@ -14,8 +14,7 @@
         <item name="colorTextRegular">@color/darkColorTextRegular</item>
         <item name="colorTextGrayed">@color/darkColorTextGrayed</item>
         <item name="colorListViewDivider">@color/darkColorListViewDivider</item>
-
-
+        <item name="colorSeparator">@color/darkColorSeparator</item>
 
 
     </style>
@@ -44,6 +43,8 @@
         <item name="colorTextRegular">@color/colorTextRegular</item>
         <item name="colorTextGrayed">@color/colorTextGrayed</item>
         <item name="colorListViewDivider">@color/colorListViewDivider</item>
+        <item name="colorSeparator">@color/colorSeparator</item>
+
 
 
 
@@ -104,28 +105,60 @@
         <item name="android:tint">?attr/colorIcon </item>
     </style>
 
+    <style name="styleIcon.clickable">
+        <item name = "android:foreground">?attr/selectableItemBackground</item>
+        <item name = "android:clickable">true</item>
+    </style>
+
+
     <style name="styleIcon.arrow">
         <item name="android:layout_marginBottom">@dimen/margin_small</item>
+        <item name="layout_goneMarginBottom">@dimen/margin_none</item>
+        <item name ="android:foreground">?attr/selectableItemBackground</item>
     </style>
 
     <style name="styleFloatingActionBtn">
-        <item name="android:elevation">25dp</item>
-
         <item name="android:tint">?attr/tintFloatingActionBtn </item>
         <item name="android:backgroundTint">?attr/bgdTintFloatingActionBtn </item>
+        <item name="android:layout_marginBottom">@dimen/margin_medium</item>
+
     </style>
 
-    <style name="styleText">
+    <style name="styleTextView">
         <item name="android:textColor">?attr/colorTextRegular</item>
     </style>
 
-    <style name="styleText.alertInfoShown">
+    <style name="styleTextView.heading">
+        <item name="android:textSize">@dimen/font_size_heading</item>
+        <item name="android:layout_marginStart">@dimen/margin_left</item>
+    </style>
+
+    <style name="styleTextView.alertInfoShown">
         <item name="android:textSize">@dimen/font_size_alertInfoShown</item>
     </style>
 
-    <style name="styleText.alertInfoHidden">
+    <style name="styleTextView.alertInfoHidden">
         <item name="android:textSize">@dimen/font_size_alertInfoHidden</item>
+        <item name = "android:background">?attr/selectableItemBackground</item>
     </style>
+
+    <style name="styleTextView.btnsBottom">
+        <item name="android:textSize">@dimen/font_size_btns_bottom</item>
+        <item name ="android:background">?attr/selectableItemBackground</item>
+        <item name="android:gravity">left|center</item>
+    </style>
+
+
+    <style name="styleSeparator">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginStart">@dimen/margin_left</item>
+        <item name="android:background">?attr/colorSeparator</item>
+    </style>
+
+
 
 
 

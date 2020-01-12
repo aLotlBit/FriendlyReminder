@@ -2,17 +2,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.multitimer.MainActivity">
+
+  <!--
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
+
     <item
         android:id="@+id/action_throw_notification"
         android:orderInCategory="100"
         android:title="Throw Notification"
         app:showAsAction="never" />
+        -->
 
     <item
         android:id="@+id/action_sort_by"
@@ -21,6 +25,7 @@
         app:showAsAction="never" >
 
         <menu>
+            <group android:id="@+id/sort_mode" >
             <item
                 android:id="@+id/sub_action_sort_by_daysUntilAlert"
                 android:title="@string/sub_action_sort_by_daysUntilAlert"
@@ -33,16 +38,29 @@
                 android:checkable="true"
                 app:showAsAction="never"/>
             <item
-                android:id="@+id/sub_action_sort_by_alertActive"
-                android:title="@string/sub_action_sort_by_alertActive"
+                android:id="@+id/sub_action_sort_by_alphabet"
+                android:title="@string/sub_action_sort_by_alphabet"
+                android:checkable="true"
+                app:showAsAction="never"/>
+
+            </group>
+
+            <group android:id="@+id/sort_direction" android:checkableBehavior="single">
+
+            <item
+                android:id="@+id/sub_action_sort_ascending"
+                android:title="@string/sub_action_sort_ascending"
                 android:checkable="true"
                 app:showAsAction="never"/>
 
             <item
-                android:id="@+id/sub_action_sort_inverted"
-                android:title="@string/sub_action_sort_inverted"
+                android:id="@+id/sub_action_sort_descending"
+                android:title="@string/sub_action_sort_descending"
                 android:checkable="true"
                 app:showAsAction="never"/>
+
+
+            </group>
         </menu>
     </item>
 

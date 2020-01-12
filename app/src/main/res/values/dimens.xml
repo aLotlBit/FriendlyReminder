@@ -6,8 +6,8 @@
     <dimen name="margin_medium">16dp</dimen>
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_none">0dp</dimen>
-    <dimen name="margin_left">24dp</dimen>
-    <dimen name="margin_right">24dp</dimen>
+    <dimen name="margin_left">16dp</dimen>
+    <dimen name="margin_right">16dp</dimen>
 
 
 
@@ -19,8 +19,10 @@
     <dimen name="font_medium">11sp</dimen>
     <dimen name="font_large">24sp</dimen>
 
+    <dimen name="font_size_heading">35sp</dimen>
     <dimen name="font_size_alertInfoShown">20sp</dimen>
-    <dimen name="font_size_alertInfoHidden">11sp</dimen>
+    <dimen name="font_size_alertInfoHidden">22sp</dimen>
+    <dimen name="font_size_btns_bottom">16sp</dimen>
 
 
 

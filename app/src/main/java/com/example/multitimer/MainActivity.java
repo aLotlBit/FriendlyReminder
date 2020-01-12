@@ -8,26 +8,32 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     private Menu optionsMenu;
     private ArrayList<Item> itemsList;
 
@@ -48,11 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Boolean newItem;
 
-   // public Boolean expanded;
-
     private Item expandedItem;
-
-    EditText enterTitle;
 
     ListView listView;
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int sortMode;
 
-    private int sortInverted;
+    private int sortDirection;
 
     private MenuItem checkedMenuItem;
 
@@ -76,43 +79,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         super.onCreate(savedInstanceState);
+        //needed for backporting Java.Time functionality
+        AndroidThreeTen.init(this);
 
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        final ListView listView = (ListView) findViewById(R.id.listView);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int id = SharedPreferencesHelper.getCurrentID(getApplicationContext());
+                newItem = true;
+                showDialogTitle(new Item(id, "", System.currentTimeMillis(), -1,  -1, 0));
+            }
+        });
 
         newItem = false;
 
         itemsList = SharedPreferencesHelper.loadData(this);
-
+        final ListView listView = (ListView) findViewById(R.id.listView);
         adapter = new ItemAdapter(this, itemsList);
-
-        sortMode = SharedPreferencesHelper.getSortMode(this);
-        sortInverted = SharedPreferencesHelper.getSortInverted(this);
-
-        sortItems();
-
-
-
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                int id = SharedPreferencesHelper.getCurrentID(getApplicationContext());
-                newItem = true;
-                showDialogTitle(new Item(id, "", System.currentTimeMillis(), -1,  -1, 0));
-
-
-            }
-        });
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -122,30 +111,17 @@ public class MainActivity extends AppCompatActivity {
                 Item item = itemsList.get(position);
                 expandListItem(item);
             }
-
         });
 
-
-
-
-
-        //
         IntentFilter filter = new IntentFilter();
         filter.addAction("DISABLE_ALERT_ACTIVE");
         filter.addAction("RESTART_RUNNING");
         filter.addAction("PLUS_ONE_DAY");
         filter.addAction("PLUS_THREE_HOURS");
         filter.addAction("CONTENT");
-
-
-
-        //    registerReceiver(broadcastReceiver_, new IntentFilter("RESTART_REMINDER"));
-
         registerReceiver(broadcastReceiver, filter);
 
-
         //restarts reminder when app was closed
-
         Intent intent = getIntent();
         if (intent.getAction() == "CONTENT") {
             int id = intent.getIntExtra("id", -1);
@@ -154,7 +130,9 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "CONTENT received from launch with id" + Boolean.toString(item.getmExpanded()));
         }
 
-
+        sortMode = SharedPreferencesHelper.getSortMode(this);
+        sortDirection = SharedPreferencesHelper.getSortDirection(this);
+        sortItems();
     }
 
     @Override
@@ -166,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //saveToSharedPrefs();
     }
 
     @Override
@@ -179,15 +156,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
-      //  unregisterReceiver(broadcastReceiver_);
-
     }
 
     //resets values when app is open. AlertActive needs to be reset after alert was received in ALertReceiver
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-           // String action = intent.getAction();
             Log.d("MainActivity", "intent received:  " );
 
             switch (intent.getAction()) {
@@ -195,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                     //when alert was received alertActive needs to be set to false
                     int id = intent.getIntExtra("id", -1);
                     Item item = getItemByID(id);
-                    item.setmAlertActive(0);
+                    item.setmAlertStatus(4);
                     adapter.notifyDataSetChanged();
                     break;
                 case "RESTART_RUNNING":
@@ -204,14 +178,14 @@ public class MainActivity extends AppCompatActivity {
                     Item item_1 = getItemByID(id_1);
                     item_1.setmMillisStart(System.currentTimeMillis());
                     item_1.setmMillisEnd(item_1.calcMillisEnd(item_1.getmInterval()));
-                    item_1.setmAlertActive(1);
+                    item_1.setmAlertStatus(3);
                     adapter.notifyDataSetChanged();
                     break;
                 case "PLUS_ONE_DAY":
                     int id_2 = intent.getIntExtra("id", -1);
                     Item item_2 = getItemByID(id_2);
                     item_2.setmMillisEnd(item_2.getmMillisEnd() + ONE_DAY);
-                    item_2.setmAlertActive(1);
+                    item_2.setmAlertStatus(3);
                     adapter.notifyDataSetChanged();
                     break;
                 case "PLUS_THREE_HOURS":
@@ -223,40 +197,19 @@ public class MainActivity extends AppCompatActivity {
                     calendar.setTimeInMillis(item_3.getmMillisEnd());
                     item_3.setmHourOfDay(calendar.get(Calendar.HOUR_OF_DAY));
                     item_3.setmMinuteOfDay(calendar.get(Calendar.MINUTE));
-                    item_3.setmAlertActive(1);
+                    item_3.setmAlertStatus(3);
                     adapter.notifyDataSetChanged();
                     break;
                 case "CONTENT":
                     Log.d(TAG, "CONTENT Received");
                     int id_4 = intent.getIntExtra("id", -1);
                     Item item_4 = getItemByID(id_4);
-                    //check if item is already expanded
+                    //check if item is already expanded before expanding
                     if (item_4 != expandedItem) expandListItem(item_4);
                     break;
             }
         }
     };
-
-    /*
-
-    BroadcastReceiver broadcastReceiver_ = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("id")) {
-                int ID = intent.getIntExtra("id", -1);
-                Item item = getItemByID(ID);
-                item.setmMillisStart(System.currentTimeMillis());
-                item.setmMillisEnd(item.calcMillisEnd(item.getmInterval()));
-                item.setmAlertActive(1);
-                Log.i("blab", "blub");
-            }
-        }
-    };
-
-     */
-
-
-
 
     private void expandListItem(Item item) {
 
@@ -272,10 +225,10 @@ public class MainActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
             expandedItem = null;
         }
-
     }
 
 
+    //TODO call methods directly from adapter with item als argument
     public void changeTitle(View v, int position) {
         Item item = itemsList.get(position);
         showDialogTitle(item);
@@ -283,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeDaysLeft(View v, int position) {
         Item item = itemsList.get(position);
-        showDialogNumberPicker(item, true);
+        showDialogNumberPicker(item, 0);
     }
 
     public void changeTimeOfDay(View v, int position) {
@@ -293,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void changeInterval(View v, int position) {
         Item item = itemsList.get(position);
-        showDialogNumberPicker(item, false);
+        showDialogNumberPicker(item, 1);
     }
 
 
@@ -301,23 +254,29 @@ public class MainActivity extends AppCompatActivity {
         cancelNotification(title, id);
     }
 
-    //TODO check if interval is set
     public void restartAlert(Integer ID) {
         Item item = getItemByID(ID);
         item.setmMillisStart(System.currentTimeMillis());
-        item.setmMillisEnd(item.calcMillisEnd(item.getmInterval()));
-        SharedPreferencesHelper.setLong(getApplicationContext(), "millis_start_" + item.getmID(), item.getmMillisStart());
-        setAlert(item, item.getmMillisEnd());
+        if (item.getmInterval() != -1) {
+            item.setmMillisEnd(item.calcMillisEnd(item.getmInterval()));
+            SharedPreferencesHelper.setLong(getApplicationContext(), "millis_start_" + item.getmID(), item.getmMillisStart());
+            setAlert(item, item.getmMillisEnd());
+        } else {
+            showDialogNumberPicker(item, 1);
+        }
     }
 
     public void sortItems() {
         if (sortMode == 0) {
-            Collections.sort(itemsList, new Item.CompDaysUntilAlert());
+            Collections.sort(itemsList, new Item.CompAlertStatus().thenComparing(new Item.CompDaysUntilAlert()));
+            //Collections.sort(itemsList, new Item.CompDaysUntilAlert());
         } else if (sortMode == 1) {
             Collections.sort(itemsList, new Item.CompDaysPassed());
         } else if (sortMode == 2)
-            Collections.sort(itemsList, new Item.CompAlertActive());
-        if (sortInverted == 1 ){
+         //   Collections.sort(itemsList, new Item.CompAlertStatus());
+            Collections.sort(itemsList, new Item.CompAlphabet());
+
+        if (sortDirection == 0 ){
             Collections.reverse(itemsList);
         }
         adapter.notifyDataSetChanged();
@@ -331,15 +290,27 @@ public class MainActivity extends AppCompatActivity {
         cancelNotification(item.getmTitle(), item.getmID());
         //remove all Data
         SharedPreferencesHelper.removeDataOfItemByID(this, item.getmID());
+        Toast.makeText(getApplicationContext(), getString(R.string.item_deleted), Toast.LENGTH_SHORT).show();
+    }
+
+    private void clearData(){
+        SharedPreferencesHelper.clearAllData(getApplicationContext());
+        //cancel all alerts
+        for (int i = 0; i < itemsList.size(); i++) {
+            Item item = itemsList.get(i);
+            cancelNotification(item.getmTitle(), item.getmID());
+        }
+        itemsList.clear();
+        adapter.notifyDataSetChanged();
+        Toast.makeText(getApplicationContext(), getString(R.string.data_cleared), Toast.LENGTH_SHORT).show();
     }
 
 
-
-    //TODO Make ok-btn only clickable when title is entered
     private void showDialogTitle(final Item item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_new, null);
+        final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_title, null);
         final EditText enterTitle = dialogView.findViewById(R.id.edit_text_title);
+        //TODO set style for TextSize
         enterTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, getResources().getDimension(R.dimen.font_medium));
         enterTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -357,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setView(dialogView);
         builder.setCancelable(false);
-
         if (newItem) {
             builder.setMessage(getString(R.string.title_new));
             // close expanded item
@@ -367,8 +337,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             builder.setMessage(getString(R.string.title_change));
             enterTitle.setText(item.getmTitle());
+            if (enterTitle.hasFocus()) {
+                enterTitle.setSelection(item.getmTitle().length());
+            }
         }
-
         builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             }
@@ -382,42 +354,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
         // Create and show the AlertDialog
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
-
-
         //needed so dialog can stay open when positve button is pressed
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String title = enterTitle.getText().toString();
-                if (title.length() < 1) {
-                    Toast.makeText(getApplicationContext(), getString(R.string.no_title), Toast.LENGTH_SHORT).show();
-
+                if (title.length() == 0) {
+                    if (!newItem) {
+                        alertDialog.dismiss();
+                    } else {
+                        Toast.makeText(getApplicationContext(), getString(R.string.no_title), Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Context context = getApplicationContext();
-                    int ID = item.getmID();
-
+                    int id = item.getmID();
                     item.setmTitle(title);
-
                     if (newItem) {
                         itemsList.add(item);
-                        SharedPreferencesHelper.addIdToSet(context, ID);
-                        SharedPreferencesHelper.setLong(context, "millis_start_" + String.valueOf(ID), item.getmMillisStart());
+                        SharedPreferencesHelper.addIdToSet(context, id);
+                        SharedPreferencesHelper.setLong(context, "millis_start_" + String.valueOf(id), item.getmMillisStart());
                         expandListItem(item);
                         sortItems();
                         newItem = false;
-                    } else if (item.getmAlertActive()) {
+                    } else if (item.getmAlertStatus() == 3) {
                         //reset Alert with new title so correct title shows in notification
                         setAlert(item, item.getmMillisEnd());
                     }
-
-                    SharedPreferencesHelper.setString(context, "title_" + String.valueOf(ID), title);
+                    SharedPreferencesHelper.setString(context, "title_" + String.valueOf(id), title);
                     adapter.notifyDataSetChanged();
-
-
                     if (alertDialog != null) {
                         alertDialog.dismiss();
                     }
@@ -426,47 +393,69 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void showDialogNumberPicker(final Item item, final Boolean setDaysToAlert) {
+    public void showDialogNumberPicker(final Item item, final int mode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_number_picker, null);
         final NumberPicker numberPicker = dialogView.findViewById(R.id.number_picker);
-
-        numberPicker.setMaxValue(10);
+        final ImageView iv_keyboard = dialogView.findViewById(R.id.iv_keyboard);
+        final EditText editText = dialogView.findViewById(R.id.editText);
+        //TODO hardcoded
+        numberPicker.setMaxValue(31);
         numberPicker.setMinValue(0);
+        if (mode == 0) {
+            builder.setTitle(getString(R.string.days_until_change));
+            if (item.getDaysLeft() == -1 ){
+                Resources res = getResources();
+                numberPicker.setValue(res.getInteger(R.integer.DEFAULT_DAYS_UNTIL_ALERT));
+                editText.setText(String.valueOf(res.getInteger(R.integer.DEFAULT_DAYS_UNTIL_ALERT)));
+            } else {
+                numberPicker.setValue(item.getDaysLeft());
+                editText.setText(item.getDaysLeft().toString());
+            }
+        } else if (mode == 1){
+            builder.setTitle(getString(R.string.interval_change));
+            if (item.getmInterval() == -1) {
+                Resources res = getResources();
+                numberPicker.setValue(res.getInteger(R.integer.DEFAULT_INTERVAL));
+                editText.setText(String.valueOf(res.getInteger(R.integer.DEFAULT_INTERVAL)));
+            } else {
+                numberPicker.setValue(item.getmInterval());
+                editText.setText(item.getmInterval().toString());
+            }
 
-        if (setDaysToAlert) {
-            builder.setMessage(getString(R.string.days_until_change));
-            numberPicker.setValue(item.getDaysLeft());
-
-        } else {
-            // if !setDaysToAlert = setInterval
-            builder.setMessage(getString(R.string.interval_change));
-            numberPicker.setValue(item.getmInterval());
+            } else {
+            builder.setTitle(getString(R.string.days_passed_change));
+            numberPicker.setValue(Integer.parseInt(item.getDaysPassed()));
+            editText.setText(item.getDaysPassed());
 
         }
+
         builder.setView(dialogView);
-
-
         builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                int picked = numberPicker.getValue();
-                if (setDaysToAlert) {
-                   // item.setmMillisEnd(item.calcMillisEnd(picked));
+                int picked;
+                if (numberPicker.getVisibility() == View.VISIBLE) {
+                    picked = numberPicker.getValue();
+                } else {
+                    picked = Integer.parseInt(editText.getText().toString());
+                }
+                if (mode == 0) {
+                    // item.setmMillisEnd(item.calcMillisEnd(picked));
                     setAlert(item, item.calcMillisEnd(picked));
-
                     // set Interval to daysUntilAlert when no interval is set
                     if (item.getmInterval() == -1) {
                         item.setmInterval(picked);
                     }
-                } else {
+                } else if (mode == 1){
                     item.setmInterval(picked);
                     SharedPreferencesHelper.setInt(getApplicationContext(), "interval_" + item.getmID(), picked);
+                } else {
+                    item.setmMillisStart(System.currentTimeMillis() - Item.daysToMillis(picked));
+                    SharedPreferencesHelper.setLong(getApplicationContext(), "millis_start_" + item.getmID(), item.getmMillisStart());
                 }
                 adapter.notifyDataSetChanged();
             }
         });
-
-
         builder.setNegativeButton(getString(R.string.dialog_btn_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 if (dialog != null) {
@@ -475,42 +464,64 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
+        iv_keyboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (numberPicker.getVisibility() == View.VISIBLE) {
+                    iv_keyboard.setImageResource(R.drawable.numbers);
+                    numberPicker.setVisibility(View.GONE);
+                    editText.setVisibility(View.VISIBLE);
+                    editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                        @Override
+                        public void onFocusChange(View v, boolean hasFocus) {
+                            editText.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                                }
+                            });
+                        }
+                    });
+                    editText.requestFocus();
 
-
-    private void showDialogTimePicker(View view, final Item item) {
-
-        final TextView textView = (TextView) view;
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_set_time_of_day, null);
-
-        final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
-        timePicker.setIs24HourView(true);
-
-        Calendar calendar = Calendar.getInstance();
-
-        timePicker.setMinute(calendar.get(Calendar.MINUTE) + 1);
-
-        builder.setView(dialogView);
-
-        builder.setMessage(getString(R.string.time_of_day_change));
-        builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //hold tmp time of day to reset to in case alert is not set
-                int tmp_hour = item.getmHourOfDay();
-                int tmp_min = item.getmMinuteOfDay();
-                item.setmHourOfDay(timePicker.getHour());
-                item.setmMinuteOfDay(timePicker.getMinute());
-                if (!setAlert(item, item.calcMillisEnd(item.getDaysLeft()))) {
-                    item.setmHourOfDay(tmp_hour);
-                    item.setmMinuteOfDay(tmp_min);
-                    adapter.notifyDataSetChanged();
+                } else {
+                    iv_keyboard.setImageResource(R.drawable.keyboard);
+                    numberPicker.setVisibility(View.VISIBLE);
+                    editText.setVisibility(View.GONE);
                 }
             }
         });
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+     //   Button keyboard = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+     //   keyboard.setBackgroundResource(R.drawable.keyboard);
+     //   keyboard.setBackgroundColor(ItemAdapter.getColorByAttributeId(getApplicationContext(), R.attr.colorIcon));
+     //   keyboard.setLayoutParams(new LinearLayout.LayoutParams(70,70));
+    }
 
+    //TODO 'view' useless
+    private void showDialogTimePicker(View view, final Item item) {
+     //   final TextView textView = (TextView) view;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final View dialogView = this.getLayoutInflater().inflate(R.layout.dialog_set_time_of_day, null);
+        final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+        timePicker.setIs24HourView(true);
+        //TODO remove Calendar
+        Calendar calendar = Calendar.getInstance();
+        timePicker.setMinute(calendar.get(Calendar.MINUTE) + 1);
+        builder.setView(dialogView);
+        builder.setTitle(getString(R.string.time_of_day_change));
+        builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //hold tmp time of day to reset to in case alert is not set
+                item.setmHourOfDay(timePicker.getHour());
+                item.setmMinuteOfDay(timePicker.getMinute());
+                setAlert(item, item.calcMillisEnd(item.getDaysLeft()));
+                    adapter.notifyDataSetChanged();
+
+            }
+        });
         builder.setNegativeButton(getString(R.string.dialog_btn_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
@@ -519,7 +530,36 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
+    public void showDialogConfirmation(final Item item, final int confirmationFor) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (confirmationFor == 0) {
+            builder.setTitle(item.getmTitle());
+            builder.setMessage(getString(R.string.confirmation_msg_delete_item));
+        } else {
+            builder.setTitle(getString(R.string.confirmation_title_clear_all));
+            builder.setMessage(getString(R.string.confirmation_msg_clear_all1) + "\n" + getString(R.string.confirmation_msg_clear_all2));
+        }
+        builder.setPositiveButton(getString(R.string.dialog_btn_positve), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (confirmationFor == 0) {
+                    deleteItem(item);
+                } else {
+                    clearData();
+                }
+            }
+        });
+        builder.setNegativeButton(getString(R.string.dialog_btn_cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
         final AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
@@ -529,16 +569,19 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         optionsMenu = menu;
+        MenuCompat.setGroupDividerEnabled(menu, true);
 
         if (sortMode == 0) {
             checkedMenuItem = optionsMenu.findItem(R.id. sub_action_sort_by_daysUntilAlert).setChecked(true);
         } else if (sortMode == 1) {
             checkedMenuItem = optionsMenu.findItem(R.id.sub_action_sort_by_daysPassed).setChecked(true);
         } else if (sortMode == 2) {
-            checkedMenuItem = optionsMenu.findItem(R.id.sub_action_sort_by_alertActive).setChecked(true);
+            checkedMenuItem = optionsMenu.findItem(R.id.sub_action_sort_by_alphabet).setChecked(true);
         }
-        if (sortInverted == 1) {
-            optionsMenu.findItem(R.id. sub_action_sort_inverted).setChecked(true);
+        if (sortDirection == 1) {
+            optionsMenu.findItem(R.id. sub_action_sort_ascending).setChecked(true);
+        } else {
+            optionsMenu.findItem(R.id. sub_action_sort_descending).setChecked(true);
         }
         if (SharedPreferencesHelper.getTheme(getApplicationContext()) == 1) {
             optionsMenu.findItem(R.id.action_change_theme).setChecked(true);
@@ -564,10 +607,7 @@ public class MainActivity extends AppCompatActivity {
                 checkedMenuItem = menuItem;
             }
             keepMenuOpen(menuItem);
-        }
-
-
-        else if (id == R.id.sub_action_sort_by_daysPassed) {
+        } else if (id == R.id.sub_action_sort_by_daysPassed) {
             if (!menuItem.isChecked()) {
                 sortMode = 1;
                 sortItems();
@@ -580,13 +620,11 @@ public class MainActivity extends AppCompatActivity {
                 checkedMenuItem = menuItem;
             }
             keepMenuOpen(menuItem);
-        }
-
-        else if (id == R.id.sub_action_sort_by_alertActive) {
+        } else if (id == R.id.sub_action_sort_by_alphabet) {
             if (!menuItem.isChecked()) {
                 sortMode = 2;
                 sortItems();
-                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 1);
+                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_mode", 2);
                 //uncheck already checked item
                 if (checkedMenuItem != null) {
                     checkedMenuItem.setChecked(false); }
@@ -596,29 +634,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
             keepMenuOpen(menuItem);
-        }
-             else if (id == R.id.sub_action_sort_inverted) {
-                if (!menuItem.isChecked()) {
-                    menuItem.setChecked(true);
-                    sortInverted = 1;
-                    sortItems();
-                    SharedPreferencesHelper.setInt(getApplicationContext(), "sort_inverted", 1);
-                } else {
-                    menuItem.setChecked(false);
-                    sortInverted = 0;
-                    sortItems();
-                    SharedPreferencesHelper.setInt(getApplicationContext(), "sort_inverted", 0);
-                }
-                keepMenuOpen(menuItem);
+        } else if (id == R.id.sub_action_sort_ascending) {
+            if (!menuItem.isChecked()) {
+                menuItem.setChecked(true);
+                optionsMenu.findItem(R.id.sub_action_sort_descending).setChecked(false);
+                sortDirection = 1;
+                sortItems();
+                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_direction", 1);
+            }
+            keepMenuOpen(menuItem);
+        } else if (id == R.id.sub_action_sort_descending) {
+            if (!menuItem.isChecked()) {
+                menuItem.setChecked(true);
+                optionsMenu.findItem(R.id.sub_action_sort_ascending).setChecked(false);
+                sortDirection = 0;
+                sortItems();
+                SharedPreferencesHelper.setInt(getApplicationContext(), "sort_direction", 0);
+            }
+            keepMenuOpen(menuItem);
+
             } else if (id == R.id.action_clear_all_data){
-                SharedPreferencesHelper.clearAllData(getApplicationContext());
-                itemsList.clear();
-                adapter.notifyDataSetChanged();
-            } else if (id == R.id.action_settings) {
-                return true;
-            } else if (id == R.id.action_throw_notification) {
-            //  setAlert(System.currentTimeMillis() + 500, "Bla", 1);
-                return true;
+                showDialogConfirmation(null, 1);
             } else if (id == R.id.action_change_theme) {
             if (!menuItem.isChecked()){
                  setTheme(R.style.DarkTheme);
@@ -630,10 +666,7 @@ public class MainActivity extends AppCompatActivity {
                     menuItem.setChecked(true);
                     SharedPreferencesHelper.setInt(getApplicationContext(), "theme", 0);
                     MainActivity.this.recreate();
-
                 }
-
-
             }
             return super.onOptionsItemSelected(menuItem);
         }
@@ -686,13 +719,13 @@ public class MainActivity extends AppCompatActivity {
                     menuItem.setChecked(true);
                     Collections.reverse(itemsList);
                     adapter.notifyDataSetChanged();
-                    sortInverted = 1;
+                    sortDirection = 1;
                     SharedPreferencesHelper.setInt(getApplicationContext(), "sort_inverted", 1);
                 } else {
                     menuItem.setChecked(false);
                     Collections.reverse(itemsList);
                     adapter.notifyDataSetChanged();
-                    sortInverted = 0;
+                    sortDirection = 0;
                     SharedPreferencesHelper.setInt(getApplicationContext(), "sort_inverted", 0);
                 }
                 return true;
@@ -734,25 +767,24 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("id", item.getmID());
             intent.setAction("ALERT");
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, item.getmID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, millis_end, pendingIntent);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis_end, pendingIntent);
 
             //when alert is set set values in item
             item.setmMillisEnd(millis_end);
-            item.setmAlertActive(1);
+            item.setmAlertStatus(3);
             adapter.notifyDataSetChanged();
             //when alert is set set values in shared prefs
             SharedPreferencesHelper.setLong(getApplicationContext(), "millis_end_" + item.getmID(), item.getmMillisEnd());
-            SharedPreferencesHelper.setInt(getApplicationContext(), "alert_active_" + item.getmID(), 1);
+            SharedPreferencesHelper.setInt(getApplicationContext(), "alert_status_" + item.getmID(), 3);
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(item.getmMillisEnd());
             String time = calendar.getTime().toString();
 
-            Toast.makeText(getApplicationContext(), getString(R.string.set_alert) + time, Toast.LENGTH_LONG).show();
+       //     Toast.makeText(getApplicationContext(), getString(R.string.set_alert) + time, Toast.LENGTH_LONG).show();
             return true;
         } else {
-            //TODO display Toast not when method is called from e.g. adapter when checkbox is clicked
-            Toast.makeText(getApplicationContext(), getString(R.string.alert_in_past), Toast.LENGTH_LONG).show();
+
             return false;
         }
     }
@@ -767,7 +799,7 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction("ALERT");
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent);
-        Toast.makeText(getApplicationContext(), "Alarm Canceled", Toast.LENGTH_SHORT).show();
+  //      Toast.makeText(getApplicationContext(), "Alarm Canceled", Toast.LENGTH_SHORT).show();
     }
 
     //TODO move to itemClass als static method with itemsList als argument

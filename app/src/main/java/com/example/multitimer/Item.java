@@ -2,10 +2,24 @@ package com.example.multitimer;
 
 import android.util.Log;
 
+
+import androidx.annotation.NonNull;
+
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.temporal.ChronoUnit;
+
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-public class Item {
+public class Item implements Comparable<Item>{
 
         private static int DEFAULT_HOUR_OF_DAY = 12;
         private static int DEFAULT_MINUTE_OF_DAY = 0;
@@ -37,11 +51,12 @@ public class Item {
         this.mAlertStatus = mAlertStatus;
         this.mExpanded = false;
 
-        Calendar calendar = Calendar.getInstance();
         if (mMillisEnd != -1) {
-            calendar.setTimeInMillis(mMillisEnd);
-            this.mHourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-            this.mMinuteOfDay = calendar.get(Calendar.MINUTE);
+            LocalDateTime timeOfAlarm = Instant.ofEpochMilli(mMillisEnd)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+            this.mHourOfDay = timeOfAlarm.getHour();
+            this.mMinuteOfDay = timeOfAlarm.getMinute();
         } else {
             this.mHourOfDay = DEFAULT_HOUR_OF_DAY;
             this.mMinuteOfDay = DEFAULT_MINUTE_OF_DAY;
@@ -95,7 +110,7 @@ public class Item {
         this.mInterval = mInterval;
         }
 
-        public int getmInterval() {
+        public Integer getmInterval() {
         return mInterval;
         }
 
@@ -106,105 +121,92 @@ public class Item {
         public void setmExpanded(boolean mExpanded)  {this.mExpanded = mExpanded; };
         public boolean getmExpanded() {return mExpanded; }
 
+
+
         public Integer getDaysLeft() {
-            if (mMillisEnd != -1) {
-                Calendar calendar = Calendar.getInstance();
-
-                calendar.setTimeInMillis(mMillisEnd);
-                int day_end = calendar.get(Calendar.DAY_OF_YEAR);
-
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                int day_now = calendar.get(Calendar.DAY_OF_YEAR);
-
-                return day_end - day_now;
-            }else {
-                return -1;
-            }
-
-         /*
-            // calculation for minutes for testing
-            if (mMillisEnd != -1) {
-                Integer daysLeft = (int) ((mMillisEnd - System.currentTimeMillis()) / 1000 / 60);
-                return daysLeft;
-            } else {
-                return -1;
-            }
-
-          */
+           if (mMillisEnd != -1) {
+               LocalDate now = LocalDate.now();
+               LocalDate dayOfAlarm = Instant.ofEpochMilli(mMillisEnd)
+                       .atZone(ZoneId.systemDefault())
+                       .toLocalDate();
+               return (int) ChronoUnit.DAYS.between(now, dayOfAlarm);
+           } else {
+               return -1;
+           }
         }
 
-
         static long daysToMillis(int days) {
-        //days for later
-        // long millis = (long) days *  86400000L;
-        //minutes for testing
-        long millis = (long) days * 60 * 1000;
+        long millis = (long) days * 86400000L;
         return millis;
         }
 
+
         public String getDaysPassed (){
-            Calendar calendar = Calendar.getInstance();
-
-            calendar.setTimeInMillis(mMillisStart);
-            int day_start = calendar.get(Calendar.DAY_OF_YEAR);
-
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            int day_now = calendar.get(Calendar.DAY_OF_YEAR);
-
-            return String.valueOf(day_now - day_start);
-
-
-            /*minutes for Testing
-            long millisCurrent = System.currentTimeMillis();
-            long diff = millisCurrent - mMillisStart;
-            long min =  diff / 1000 / 60;
-
-             */
-    }
+            LocalDate now = LocalDate.now();
+            LocalDate start = Instant.ofEpochMilli(mMillisStart)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            return String.valueOf(ChronoUnit.DAYS.between(start, now));
+        }
 
 
 
-    public long calcMillisEnd(int daysToAdd) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        public long calcMillisEnd(int daysToAdd) {
+            LocalDateTime date = LocalDateTime.now().plusDays(daysToAdd).withHour(mHourOfDay).withMinute(mMinuteOfDay).withSecond(0);
+            return date.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
 
-        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
-        calendar.set(Calendar.HOUR_OF_DAY, getmHourOfDay());
-        calendar.set(Calendar.MINUTE, getmMinuteOfDay());
-        calendar.set(Calendar.SECOND, 0);
-
-       return calendar.getTimeInMillis();
-    }
-
-
-    // Comparators
-     public static class CompDaysUntilAlert implements Comparator<Item> {
         @Override
-        public int compare(Item i1, Item i2) {
-            //different sort orders for active alerts and past alerts
-            if (i1.mMillisEnd - System.currentTimeMillis() >= 0 && i2.mMillisEnd - System.currentTimeMillis() >= 0) {
-                return (int) i1.mMillisEnd - (int) i2.mMillisEnd;
+        public int compareTo(@NonNull Item i){
+            return 1;
+        }
+
+        // Comparators
+         public static class CompDaysUntilAlert implements Comparator<Item> {
+            @Override
+            public int compare(Item i1, Item i2) {
+                if (true) {
+                    if (i1.getmMillisEnd() - i2.getmMillisEnd() < 0) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    if (i2.getmMillisEnd() - i1.getmMillisEnd() < 0) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+
+                }
             }
-            return (int) i2.mMillisEnd - (int) i1.mMillisEnd;
         }
-    }
 
 
-    public static class CompDaysPassed implements Comparator<Item> {
-        @Override
-        public int compare(Item i1, Item i2) {
-            return (int) i2.mMillisStart- (int) i1.mMillisStart;
+        public static class CompDaysPassed implements Comparator<Item> {
+            @Override
+            public int compare(Item i1, Item i2) {
+                if (i1.getmMillisStart() - i2.getmMillisStart() < 0 ) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
         }
-    }
 
-    public static class CompAlertStatus implements Comparator<Item> {
-        @Override
-        public int compare(Item i1, Item i2) {
-
-
-            return (int) i1.getmAlertStatus() - i2.getmAlertStatus();
+        public static class CompAlertStatus implements Comparator<Item> {
+            @Override
+            public int compare(Item i1, Item i2) {
+                return i2.getmAlertStatus() - i1.getmAlertStatus();
+            }
         }
-    }
+
+        public static class CompAlphabet implements Comparator<Item> {
+            @Override
+            public int compare(Item i1, Item i2) {
+                return i1.getmTitle().compareToIgnoreCase(i2.getmTitle());
+            }
+        }
 
 
 }

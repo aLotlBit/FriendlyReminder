@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import androidx.core.content.ContextCompat;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +16,6 @@ public class SharedPreferencesHelper {
 
     static ArrayList<Item> loadData(Context mContext) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-    //    SharedPreferences.Editor mEdit = mSharedPrefs.edit();
 
         Set<String> s = new HashSet<String>();
         Set<String> set_ids = mSharedPrefs.getStringSet("set_ids", s);
@@ -28,11 +29,10 @@ public class SharedPreferencesHelper {
             long millisStart = mSharedPrefs.getLong("millis_start_" + id, -1);
             long millisEnd = mSharedPrefs.getLong("millis_end_" + id, -1);
             int interval = mSharedPrefs.getInt("interval_" + id, -1);
-            int alertActive = mSharedPrefs.getInt("alert_active_" + id, 0);
+            int alertActive = mSharedPrefs.getInt("alert_status_" + id, 0);
 
             itemsList.add(new Item(Integer.parseInt(id), title, millisStart, millisEnd, interval, alertActive));
         }
-    //    mEdit.commit();
         return itemsList;
     }
 
@@ -41,9 +41,9 @@ public class SharedPreferencesHelper {
         return mSharedPrefs.getInt("sort_mode", 0);
     }
 
-    static int getSortInverted(Context mContext) {
+    static int getSortDirection(Context mContext) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return mSharedPrefs.getInt("sort_inverted", 0);
+        return mSharedPrefs.getInt("sort_direction", 0);
     }
 
     static int getTheme(Context mContext) {
@@ -53,7 +53,6 @@ public class SharedPreferencesHelper {
 
     static ArrayList<Item> getItemsWithActiveAlerts(Context mContext) {
         SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-     //   SharedPreferences.Editor mEdit = mSharedPrefs.edit();
 
         Set<String> s = new HashSet<String>();
         Set<String> set_ids = mSharedPrefs.getStringSet("set_ids", s);
@@ -70,7 +69,6 @@ public class SharedPreferencesHelper {
                 itemsList.add(new Item(Integer.parseInt(id), title, -1, millisEnd, -1, 1));
             }
         }
-      //  mEdit.commit();
         return itemsList;
     }
 

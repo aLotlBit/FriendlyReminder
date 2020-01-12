@@ -8,23 +8,21 @@
 
     <TextView
         android:id="@+id/tv_title"
-        style="@style/styleText"
+        style="@style/styleTextView.heading"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_left"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="48dp"
-        android:textSize="@dimen/font_large"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintEnd_toStartOf="@+id/tv_days_passed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        />
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/tv_days_passed"
-        style="@style/styleText"
+        style="@style/styleTextView.alertInfoShown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
@@ -38,8 +36,8 @@
         android:id="@+id/expanded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:constraint_referenced_ids="tv_interval,separator,tv_delete,tv_reset,cb_alert_active,tv_days_left,tv_time_of_day,iv_day,iv_time,iv_interval,iv_delete"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_interval,separator,tv_delete,tv_reset,tv_days_left,tv_time_of_day,iv_day,iv_time_of_day,iv_interval,iv_delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -48,13 +46,12 @@
 
     <TextView
         android:id="@+id/tv_interval"
-        style="@style/styleText.alertInfoHidden"
+        style="@style/styleTextView.alertInfoHidden"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="3d interval"
-        android:textSize="@dimen/font_medium"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/iv_interval"
         app:layout_constraintTop_toBottomOf="@+id/tv_time_of_day" />
@@ -68,7 +65,7 @@
 
     <ImageView
         android:id="@+id/iv_alarm"
-        style="@style/styleIcon"
+        style="@style/styleIcon.clickable"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title"
@@ -76,7 +73,7 @@
 
     <TextView
         android:id="@+id/tv_days_left"
-        style="@style/styleText.alertInfoHidden"
+        style="@style/styleTextView.alertInfoHidden"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -90,10 +87,9 @@
 
     <TextView
         android:id="@+id/tv_reset"
-        style="@style/styleText"
+        style="@style/styleTextView.btnsBottom"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         android:text="Reset"
         android:textAlignment="textEnd"
         android:textSize="14sp"
@@ -104,24 +100,20 @@
 
     <TextView
         android:id="@+id/tv_time_of_day"
-        style="@style/styleText.alertInfoHidden"
+        style="@style/styleTextView.alertInfoHidden"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="at 17:00"
         app:layout_constraintEnd_toEndOf="@+id/tv_interval"
-        app:layout_constraintStart_toEndOf="@+id/iv_time"
+        app:layout_constraintStart_toEndOf="@+id/iv_time_of_day"
         app:layout_constraintTop_toBottomOf="@+id/tv_days_left" />
 
     <View
         android:id="@+id/separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/margin_left"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:background="#000"
+        style="@style/styleSeparator"
+        android:layout_marginBottom="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
@@ -130,12 +122,11 @@
 
     <TextView
         android:id="@+id/tv_delete"
-        style="@style/styleText"
+        style="@style/styleTextView.btnsBottom"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_height="0dp"
         android:text="@string/btn_delete"
+        android:textAlignment="gravity"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/iv_delete"
@@ -144,11 +135,13 @@
     <ImageView
         android:id="@+id/iv_arrow"
         style="@style/styleIcon.arrow"
+        app:layout_goneMarginBottom="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
         app:layout_constraintBottom_toTopOf="@+id/separator"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/iv_days_passed"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/arrow_down" />
 
     <CheckBox
@@ -161,7 +154,7 @@
 
     <TextView
         android:id="@+id/tv_days_left_shown"
-        style="@style/styleText.alertInfoShown"
+        style="@style/styleTextView.alertInfoShown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -174,7 +167,7 @@
 
     <TextView
         android:id="@+id/tv_time_of_day_shown"
-        style="@style/styleText.alertInfoShown"
+        style="@style/styleTextView.alertInfoShown"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="at 17:00"
@@ -187,7 +180,7 @@
 
     <ImageView
         android:id="@+id/iv_day"
-        style="@style/styleIcon"
+        style="@style/styleIcon.clickable"
         app:layout_constraintBottom_toBottomOf="@+id/tv_days_left"
         app:layout_constraintEnd_toStartOf="@+id/tv_days_left"
         app:layout_constraintHorizontal_bias="0.5"
@@ -198,8 +191,8 @@
 
 
     <ImageView
-        android:id="@+id/iv_time"
-        style="@style/styleIcon"
+        android:id="@+id/iv_time_of_day"
+        style="@style/styleIcon.clickable"
         app:layout_constraintBottom_toBottomOf="@+id/tv_time_of_day"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_time_of_day"
@@ -207,22 +200,15 @@
 
     <ImageView
         android:id="@+id/iv_interval"
-        style="@style/styleIcon"
+        style="@style/styleIcon.clickable"
         app:layout_constraintBottom_toBottomOf="@+id/tv_interval"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tv_interval"
         app:srcCompat="@drawable/interval" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85888076" />
-
     <ImageView
         android:id="@+id/iv_delete"
-        style="@style/styleIcon"
+        style="@style/styleIcon.clickable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_left"
@@ -233,7 +219,7 @@
 
     <ImageView
         android:id="@+id/iv_days_passed"
-        style="@style/styleIcon"
+        style="@style/styleIcon.clickable"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="3dp"
@@ -249,6 +235,20 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_end="@dimen/margin_right" />
+
+    <ImageView
+        android:id="@+id/iv_eye"
+        style="@style/styleIcon.clickable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_days_left_shown"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/tv_days_left_shown"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/eye"
+        android:clickable="true"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

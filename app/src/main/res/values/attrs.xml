@@ -11,6 +11,8 @@
     <attr name="colorTextRegular" format="reference"/>
     <attr name="colorTextGrayed" format="reference"/>
     <attr name="colorListViewDivider" format="reference"/>
+    <attr name="colorSeparator" format="reference"/>
+
 
 
 
