@@ -7,4 +7,14 @@ with the given interval or repeated later in case you don't have time to perform
 Reminders will be highlighted until marked 'seen' or restarted.
 
 
+[StartUp View](screenshots/screenshot1)
+
+[Notification](screenshots/screenshot2)
+
+[Highlighted Reminder](screenshots/screenshot3)
+
+[Sort Options](screenshots/screenshot4)
+
+
+
 
